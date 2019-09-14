@@ -1,20 +1,34 @@
-require("expose-loader?$!jquery");
-import 'bootstrap';
-
-import anime from 'animejs';
-import TWEEN from 'tween.js';
-import * as THREE from 'three';
-import * as POSTPROCESSING from 'postprocessing';
-import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
-import React from "react";
-import ReactDOM from "react-dom";
-import App from './App.jsx';
-
+import $ from 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './css/index.css';
-import 'loaders.css/loaders.min.css';
-import 'loaders.css/loaders.css'
+import anime from 'animejs/lib/anime.es';
+import TWEEN from '@tweenjs/tween.js';
+import {
+    BackSide,
+    BoxGeometry,
+    Color,
+    DirectionalLight, Group,
+    ImageLoader,
+    Mesh,
+    MeshBasicMaterial,
+    MeshPhongMaterial, Object3D, PerspectiveCamera, Scene, Vector2,
+    Vector3, WebGLRenderer
+} from "three/build/three.module";
 
+import { EffectComposer, SMAAEffect, BlendFunction, DotScreenEffect, EffectPass, RenderPass } from 'postprocessing';
+import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { App } from './App.jsx';
+import 'loaders.css/loaders.min.css';
+
+import './css/index.css';
+
+
+
+
+// export for others scripts to use
+window.$ = $;
+window.jQuery = jQuery;
 
 var renderer, scene, camera, cube, then, composer, camera2, scene2, renderer2;
 var sphereArray = [];
@@ -32,12 +46,12 @@ var tweenZoomAction;
 
 var rotationSpeedMultiplier = {y: 1};
 
-const Vector3zero = new THREE.Vector3(0, 0, 0);
-const Vector3one = new THREE.Vector3(1, 1, 1);
-const Vector3two = new THREE.Vector3(2, 2, 2);
+const Vector3zero = new Vector3(0, 0, 0);
+const Vector3one = new Vector3(1, 1, 1);
+const Vector3two = new Vector3(2, 2, 2);
 
-var defaultCamPos, nextCamPos = new THREE.Vector2();
-var nextCam2Pos = new THREE.Vector2(0, 0);
+var defaultCamPos, nextCamPos = new Vector2();
+var nextCam2Pos = new Vector2(0, 0);
 
 var isMouseDownOnEmpty = false;
 var isInMainScreen = false;
@@ -48,13 +62,13 @@ var dotScreenEffect;
 
 var currentAnimationIndex = 0;
 
-var css3dObjNextRot = new THREE.Vector3(0,0,0);
+var css3dObjNextRot = new Vector3(0,0,0);
 
 var css3dObjArray = [];
-var css3dObjGroup = new THREE.Object3D();
+var css3dObjGroup = new Object3D();
 var curCss3dObjIndex = 0;
 
-var mouse = new THREE.Vector2();
+var mouse = new Vector2();
 
 var outline_mat, outline;
 
@@ -102,12 +116,12 @@ $(function(){
 
     function insertThreeJSCanvas() {
 
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-        camera2 = new THREE.PerspectiveCamera( 75, window.innerWidth / $("main").outerHeight(true), 0.1, 1000 );
+        scene = new Scene();
+        camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        camera2 = new PerspectiveCamera( 75, window.innerWidth / $("main").outerHeight(true), 0.1, 1000 );
 
         //CSS3D Scene
-        scene2 = new THREE.Scene();
+        scene2 = new Scene();
         renderer2 = new CSS3DRenderer();
         renderer2.setSize(window.innerWidth, $("main").outerHeight(true));
         renderer2.domElement.className += " css3d centered";
@@ -128,7 +142,7 @@ $(function(){
 
 
 
-        renderer = new THREE.WebGLRenderer( { alpha: true, antialias: false} );
+        renderer = new WebGLRenderer( { alpha: true, antialias: false} );
         // renderer.setClearColor(0xf1f2f3, 1);
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.setPixelRatio( window.devicePixelRatio );
@@ -136,15 +150,15 @@ $(function(){
 
 
 
-        sphereGroup = new THREE.Group();
+        sphereGroup = new Group();
 
         var maxCount = 10;
         var perGap = 0.4;
 
-        outline_mat = new THREE.MeshBasicMaterial({color : 0xffffff, transparent : true, opacity: 0,  side: THREE.BackSide});
-        var cube_geo = new THREE.BoxGeometry(  0.05, 0.05, 0.05  );
+        outline_mat = new MeshBasicMaterial({color : 0xffffff, transparent : true, opacity: 0,  side: BackSide});
+        var cube_geo = new BoxGeometry(  0.05, 0.05, 0.05  );
         var outline_geo = cube_geo.clone();
-        var cube_mat = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+        var cube_mat = new MeshPhongMaterial( { color: 0xffffff } );
 
         for (var i = 0; i < maxCount; i ++) {
             for (var j = 0; j < maxCount; j ++) {
@@ -153,20 +167,20 @@ $(function(){
 
                     var index = i + j * maxCount + k * maxCount * maxCount;
 
-                    sphereArray[index] = new THREE.Mesh( cube_geo, cube_mat );
-                    var temp = new THREE.Vector3( i * perGap - (maxCount - 1) * perGap / 2, j * perGap - (maxCount - 1) * perGap / 2, k * perGap - (maxCount - 1) * perGap / 2);
+                    sphereArray[index] = new Mesh( cube_geo, cube_mat );
+                    var temp = new Vector3( i * perGap - (maxCount - 1) * perGap / 2, j * perGap - (maxCount - 1) * perGap / 2, k * perGap - (maxCount - 1) * perGap / 2);
                     sphereBigCubePosArray[index] = temp.clone().multiplyScalar(0.9);
                     sphereGoToPosArray[index] = temp.clone();
                     sphereSmallCubePosArray[index] = temp.clone().multiplyScalar(0.33);
-                    sphereSizeArray[index] = new THREE.Vector3(2, 2, 2);
-                    sphereRotArray[index] = new THREE.Vector3(0, 0, 0);
+                    sphereSizeArray[index] = new Vector3(2, 2, 2);
+                    sphereRotArray[index] = new Vector3(0, 0, 0);
 
 
                     sphereArray[index].position.set(temp.x, temp.y, temp.z);
 
                     //Notice the second parameter of the material
 
-                    outline = new THREE.Mesh(outline_geo, outline_mat);
+                    outline = new Mesh(outline_geo, outline_mat);
                     //Scale the object up to have an outline (as discussed in previous answer)
                     outline.scale.multiplyScalar(1.1);
                     //Scale the object up to have an outline (as discussed in previous answer)
@@ -194,17 +208,17 @@ $(function(){
 
 
 
-        var directionalLight = new THREE.DirectionalLight( 0xff7722, 1 );
+        var directionalLight = new DirectionalLight( 0xff7722, 1 );
         directionalLight.position.set(0,2,1);
 
         scene.add( directionalLight );
 
-        var directionalLight = new THREE.DirectionalLight( 0x2288ff, 1.1 );
+        var directionalLight = new DirectionalLight( 0x2288ff, 1.1 );
         directionalLight.position.set(-2,-2,3);
 
         scene.add( directionalLight );
 
-        var directionalLight = new THREE.DirectionalLight( 0x00ffff, 0.5 );
+        var directionalLight = new DirectionalLight( 0x00ffff, 0.5 );
         directionalLight.position.set(2,0,0);
 
         scene.add( directionalLight );
@@ -233,7 +247,7 @@ $(function(){
                         var index = i + j * maxCount + k * maxCount * maxCount;
 
                         sphereGoToPosArray[index].copy(sphereSmallCubePosArray[index]);
-                        sphereSizeArray[index].copy(new THREE.Vector3(2.7,2.7,2.7));
+                        sphereSizeArray[index].copy(new Vector3(2.7,2.7,2.7));
                         sphereRotArray[index].copy(Vector3zero);
                     }
                 }
@@ -399,25 +413,25 @@ $(function(){
         }
 
 
-        composer = new POSTPROCESSING.EffectComposer(renderer);
+        composer = new EffectComposer(renderer);
 
-        var loader = new THREE.ImageLoader();
-        searchImage = loader.load(POSTPROCESSING.SMAAEffect.searchImageDataURL);
-        areaImage = loader.load(POSTPROCESSING.SMAAEffect.areaImageDataURL);
+        var loader = new ImageLoader();
+        searchImage = loader.load(SMAAEffect.searchImageDataURL);
+        areaImage = loader.load(SMAAEffect.areaImageDataURL);
 
-        smaaEffect = new POSTPROCESSING.SMAAEffect(searchImage, areaImage);
+        smaaEffect = new SMAAEffect(searchImage, areaImage);
 
-        dotScreenEffect = new POSTPROCESSING.DotScreenEffect({
-            blendFunction: POSTPROCESSING.BlendFunction.DARKEN,
+        dotScreenEffect = new DotScreenEffect({
+            blendFunction: BlendFunction.DARKEN,
             scale: 1.0,
             angle: Math.PI * 0.55
         });
 
 
-        const effectPass = new POSTPROCESSING.EffectPass(camera , smaaEffect , dotScreenEffect  );
+        const effectPass = new EffectPass(camera , smaaEffect , dotScreenEffect  );
         effectPass.renderToScreen = true;
 
-        composer.addPass(new POSTPROCESSING.RenderPass(scene, camera));
+        composer.addPass(new RenderPass(scene, camera));
         composer.addPass(effectPass);
 
 
@@ -540,7 +554,7 @@ $(function(){
     }
 
     function Vector3Lerp(b, e, i) {
-        var newVector3 = new THREE.Vector3();
+        var newVector3 = new Vector3();
         newVector3.x = getTween(b.x, e.x, i);
         newVector3.y = getTween(b.y, e.y, i);
         newVector3.z = getTween(b.z, e.z, i);
@@ -548,7 +562,7 @@ $(function(){
     }
 
     function ColorLerp(b, e, i) {
-        var newColor = new THREE.Color();
+        var newColor = new Color();
         newColor.r = getTween(b.r, e.r, i);
         newColor.g = getTween(b.b, e.b, i);
         newColor.b = getTween(b.g, e.g, i);

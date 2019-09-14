@@ -107,7 +107,7 @@ class WorkContainer extends React.Component {
     }
 }
 
-class App extends React.Component {
+export class App extends React.Component {
     render() {
         const works = this.props.parsedJsonData.map((json) => <WorkContainer json={json} key={json.title} />);
 
@@ -118,5 +118,3 @@ class App extends React.Component {
         );
     }
 }
-
-export default App;

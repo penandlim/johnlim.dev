@@ -1,28 +1,26 @@
 {
   "name": "johnlimdev",
+  "sideEffects": [
+    "*.css"
+  ],
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "webpack-dev-server --open --mode development",
-    "build": "webpack --mode production"
+    "build": "cross-env NODE_ENV=production webpack --mode production",
+    "stats": "cross-env NODE_ENV=production webpack --mode production --profile --json > stats.json"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.6.0",
+    "@tweenjs/tween.js": "^18.3.1",
     "animejs": "^3.1.0",
-    "babel-runtime": "^6.26.0",
     "bootstrap": "^4.3.1",
-    "copy-webpack-plugin": "^5.0.4",
-    "css-loader": "^3.2.0",
-    "expose-loader": "^0.7.5",
     "jquery": "^3.4.1",
     "loaders.css": "^0.1.2",
     "popper.js": "^1.15.0",
     "postprocessing": "^6.7.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "style-loader": "^1.0.0",
-    "three": "^0.108.0",
-    "tween.js": "^16.6.0"
+    "three": "^0.108.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.0",
@@ -30,10 +28,20 @@
     "@babel/preset-env": "^7.6.0",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
+    "babel-preset-minify": "^0.5.1",
+    "babel-runtime": "^6.26.0",
+    "copy-webpack-plugin": "^5.0.4",
+    "cross-env": "^5.2.1",
+    "css-loader": "^3.2.0",
     "dynamic-cdn-webpack-plugin": "^4.0.0",
+    "expose-loader": "^0.7.5",
+    "html-inline-css-webpack-plugin": "^1.8.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.8.0",
     "module-to-cdn": "^3.1.5",
+    "style-loader": "^1.0.0",
+    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.40.2",
     "webpack-cli": "^3.3.8",
     "webpack-dev-server": "^3.8.0"
