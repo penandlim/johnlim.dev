@@ -8,12 +8,21 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.6.0",
+    "animejs": "^3.1.0",
     "babel-runtime": "^6.26.0",
+    "bootstrap": "^4.3.1",
     "copy-webpack-plugin": "^5.0.4",
+    "css-loader": "^3.2.0",
+    "expose-loader": "^0.7.5",
+    "jquery": "^3.4.1",
+    "loaders.css": "^0.1.2",
+    "popper.js": "^1.15.0",
     "postprocessing": "^6.7.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "three": "^0.108.0"
+    "style-loader": "^1.0.0",
+    "three": "^0.108.0",
+    "tween.js": "^16.6.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.0",

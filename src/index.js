@@ -1,5 +1,20 @@
+require("expose-loader?$!jquery");
+import 'bootstrap';
+
+import anime from 'animejs';
+import TWEEN from 'tween.js';
+import * as THREE from 'three';
+import * as POSTPROCESSING from 'postprocessing';
+import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
+import React from "react";
+import ReactDOM from "react-dom";
 import App from './App.jsx';
-import { CSS3DRenderer, CSS3DObject } from './CSS3DRenderer.js';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './css/index.css';
+import 'loaders.css/loaders.min.css';
+import 'loaders.css/loaders.css'
+
 
 var renderer, scene, camera, cube, then, composer, camera2, scene2, renderer2;
 var sphereArray = [];
@@ -36,7 +51,8 @@ var currentAnimationIndex = 0;
 var css3dObjNextRot = new THREE.Vector3(0,0,0);
 
 var css3dObjArray = [];
-var curCss3dObj;
+var css3dObjGroup = new THREE.Object3D();
+var curCss3dObjIndex = 0;
 
 var mouse = new THREE.Vector2();
 
@@ -45,6 +61,8 @@ var outline_mat, outline;
 var AnimToSmallCubeTrigger, AnimToBigCubeTrigger, AnimToComplexTrigger, AnimToRingTrigger;
 
 var searchImage, areaImage, smaaEffect;
+
+var isListBeingScrolled = false;
 
 // Obtain the root
 const rootElement = document.getElementById('root');
@@ -82,10 +100,6 @@ $(function(){
 
     then = 0;
 
-    const clock = new THREE.Clock();
-
-
-
     function insertThreeJSCanvas() {
 
         scene = new THREE.Scene();
@@ -101,14 +115,16 @@ $(function(){
 
         //CSS Object
         var div;
-        $(".workContainer").each(function() {
+        $(".workContainer").each(function(index) {
             div = new CSS3DObject(this);
             div.position.x = 0;
-            div.position.y = 100;
+            div.position.y = 100 - index * 1000;
             div.position.z = -600;
-            scene2.add(div);
-            curCss3dObj = div;
+            css3dObjGroup.add(div);
+            css3dObjArray.push(div);
         });
+
+        scene2.add(css3dObjGroup);
 
 
 
@@ -375,7 +391,11 @@ $(function(){
             var newCam2Pos = Vector3Lerp(camera2.position, nextCam2Pos, delta * 2);
             camera2.position.set(newCam2Pos.x, newCam2Pos.y, camera2.position.z);
 
-            curCss3dObj.rotation.setFromVector3(Vector3Lerp(curCss3dObj.rotation.toVector3(), css3dObjNextRot, delta * 3));
+            for (let i = 0; i < css3dObjArray.length; i++) {
+                css3dObjArray[i].rotation.setFromVector3(Vector3Lerp(css3dObjArray[i].rotation.toVector3(), css3dObjNextRot, delta * 3));
+            }
+
+
         }
 
 
@@ -567,6 +587,66 @@ $(function(){
         onMouseUp(event);
 
     });
+
+    $(window).on('wheel', function(e) {
+
+        var delta = e.originalEvent.deltaY;
+
+        if (delta > 0)
+            scrollListDown();
+        else
+            scrollListUp();
+
+        return false; // this line is only added so the whole page won't scroll in the demo
+    });
+
+    function scrollListDown() {
+        if (!isListBeingScrolled && curCss3dObjIndex < css3dObjArray.length - 1) {
+            isListBeingScrolled = true;
+            new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+                .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
+                .easing(TWEEN.Easing.Cubic.Out)
+                .start();
+
+            new TWEEN.Tween(css3dObjArray[curCss3dObjIndex + 1].scale)
+                .to({x: 1, y: 1, z: 1}, 800)
+                .easing(TWEEN.Easing.Back.Out)
+                .start();
+
+            new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
+                .to({ y: css3dObjGroup.position.y + 1000 }, 800) // Move to (300, 200) in 1 second.
+                .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
+                .onComplete(function() {
+                    isListBeingScrolled = false;
+                    curCss3dObjIndex += 1;
+                })
+                .start(); // Sta
+        }
+    }
+
+    function scrollListUp() {
+        if (!isListBeingScrolled && curCss3dObjIndex > 0) {
+            isListBeingScrolled = true;
+            new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+                .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
+                .easing(TWEEN.Easing.Cubic.Out)
+                .start();
+
+            new TWEEN.Tween(css3dObjArray[curCss3dObjIndex - 1].scale)
+                .to({x: 1, y: 1, z: 1}, 800)
+                .easing(TWEEN.Easing.Quadratic.InOut)
+                .start();
+
+            new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
+                .to({ y: css3dObjGroup.position.y - 1000 }, 800) // Move to (300, 200) in 1 second.
+                .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
+                .onComplete(function() {
+                    isListBeingScrolled = false;
+                    curCss3dObjIndex -= 1;
+                })
+                .start(); // Sta
+        }
+    }
 
     function onDocumentMouseMove(event) {
         event.preventDefault();
