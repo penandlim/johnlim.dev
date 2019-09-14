@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaScriptLibraryMappings">
+    <file url="PROJECT" libraries="{6d72a89095, THREE.MeshLine, Tween, anime, babel, bootstrap, index, jquery, loaders.css, popper, postprocessing, react-dom.development, react-dom.production, react.development, react.production, three}" />
+    <includedPredefinedLibrary name="Node.js Core" />
+  </component>
+</project>

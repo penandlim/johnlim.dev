@@ -1,0 +1,69 @@
+{
+  "works":[
+    {
+      "title":"johnlim.dev",
+      "previewType":"youtube",
+      "previewSrc":"https://www.youtube.com/embed/9ZxZqTMnBYk",
+      "descriptionText":"Personal website featuring past works.",
+      "keywords":[
+        {
+          "type":"frontend",
+          "keyword":"three.js"
+        },
+        {
+          "type":"frontend",
+          "keyword":"React.js"
+        },
+        {
+          "type":"frontend",
+          "keyword":"Bootstrap"
+        },
+        {
+          "type":"backend",
+          "keyword":"AWS S3"
+        },
+        {
+          "type":"other",
+          "keyword":"Shader programming"
+        }
+      ],
+      "links":{
+        "direct":"https://johnlim.dev",
+        "github":"https://github.com"
+      }
+    },
+    {
+      "title":"johnlim.dev2",
+      "previewType":"youtube",
+      "previewSrc":"https://www.youtube.com/embed/9ZxZqTMnBYk",
+      "descriptionText":"Personal website featuring past works.",
+      "keywords":[
+        {
+          "type":"frontend",
+          "keyword":"three.js"
+        },
+        {
+          "type":"frontend",
+          "keyword":"React.js"
+        },
+        {
+          "type":"frontend",
+          "keyword":"Bootstrap"
+        },
+        {
+          "type":"backend",
+          "keyword":"AWS S3"
+        },
+        {
+          "type":"other",
+          "keyword":"Shader programming"
+        }
+      ],
+      "links":{
+        "direct":"https://johnlim.dev",
+        "github":"https://github.com"
+      }
+    }
+
+  ]
+}
