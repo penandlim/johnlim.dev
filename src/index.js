@@ -4,18 +4,21 @@ import anime from 'animejs/lib/anime.es';
 import TWEEN from '@tweenjs/tween.js';
 import {
     BackSide,
-    BoxGeometry,
+    BoxGeometry, BufferGeometry,
     Color,
-    DirectionalLight, Group,
-    ImageLoader,
+    DirectionalLight, EdgesGeometry,
+    ImageLoader, LineSegments,
     Mesh,
     MeshBasicMaterial,
     MeshPhongMaterial, Object3D, PerspectiveCamera, Scene, Vector2,
-    Vector3, WebGLRenderer
-} from "three/build/three.module";
+    Vector3, WebGLRenderer, WireframeGeometry
+} from "three";
 
-import { EffectComposer, SMAAEffect, BlendFunction, DotScreenEffect, EffectPass, RenderPass } from 'postprocessing';
+import { EffectComposer, SMAAEffect, BlendFunction, DotScreenEffect, EffectPass, RenderPass } from 'postprocessing/build/postprocessing.esm';
 import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
+import { Wireframe } from 'three/examples/jsm/lines/Wireframe.js';
+import { WireframeGeometry2 } from 'three/examples/jsm/lines/WireframeGeometry2.js';
+
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { App } from './App.jsx';
@@ -23,6 +26,7 @@ import 'loaders.css/loaders.min.css';
 
 import './css/index.css';
 
+import "grained";
 
 
 
@@ -39,6 +43,8 @@ var sphereGoToColorArray = [];
 var sphereSmallCubePosArray = [];
 var sphereSizeArray = [];
 var sphereRotArray = [];
+
+var wireframeArray = [];
 
 var speedMultiplier = 3;
 
@@ -76,18 +82,43 @@ var AnimToSmallCubeTrigger, AnimToBigCubeTrigger, AnimToComplexTrigger, AnimToRi
 
 var searchImage, areaImage, smaaEffect;
 
+var loader = new ImageLoader();
+searchImage = loader.load(SMAAEffect.searchImageDataURL);
+areaImage = loader.load(SMAAEffect.areaImageDataURL);
+
 var isListBeingScrolled = false;
 
 // Obtain the root
 const rootElement = document.getElementById('root');
 
+var mainEl = $("main");
+var scrollBar;
+
+var totalWorksCount;
+
+var innerBar, outerBar;
+
 
 $(function(){
+
+    innerBar = $(".innerBar");
+    outerBar = $(".outerBar");
+
+    grained("#grain", {
+        animate: true,
+        patternWidth: 260,
+        patternHeight: 182,
+        grainOpacity: 0.1,
+        grainDensity: 1,
+        grainWidth: 1.7,
+        grainHeight: 2.2
+    });
 
     fetch("works.json")
         .then(response => response.json())
         .then((jsonData) => {
             const parsedJsonData = jsonData.works;
+            totalWorksCount = jsonData.works.length;
             ReactDOM.render(
                 <App parsedJsonData={parsedJsonData}/>,
                 rootElement, function() {
@@ -118,12 +149,12 @@ $(function(){
 
         scene = new Scene();
         camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-        camera2 = new PerspectiveCamera( 75, window.innerWidth / $("main").outerHeight(true), 0.1, 1000 );
+        camera2 = new PerspectiveCamera( 75, window.innerWidth / mainEl.outerHeight(true), 0.1, 1000 );
 
         //CSS3D Scene
         scene2 = new Scene();
         renderer2 = new CSS3DRenderer();
-        renderer2.setSize(window.innerWidth, $("main").outerHeight(true));
+        renderer2.setSize(window.innerWidth, mainEl.outerHeight(true));
         renderer2.domElement.className += " css3d centered";
         document.body.appendChild(renderer2.domElement);
 
@@ -140,6 +171,12 @@ $(function(){
 
         scene2.add(css3dObjGroup);
 
+        scrollBar = new CSS3DObject(outerBar[0]);
+        scrollBar.position.x = 240;
+        scrollBar.position.y = 0;
+        scrollBar.position.z = -400;
+        scene2.add(scrollBar);
+
 
 
         renderer = new WebGLRenderer( { alpha: true, antialias: false} );
@@ -150,15 +187,15 @@ $(function(){
 
 
 
-        sphereGroup = new Group();
+        sphereGroup = new Object3D();
 
         var maxCount = 10;
         var perGap = 0.4;
 
-        outline_mat = new MeshBasicMaterial({color : 0xffffff, transparent : true, opacity: 0,  side: BackSide});
+        outline_mat = new MeshBasicMaterial({color : 0x000000, transparent : true, opacity: 1,  side: BackSide, depthTest : false});
         var cube_geo = new BoxGeometry(  0.05, 0.05, 0.05  );
         var outline_geo = cube_geo.clone();
-        var cube_mat = new MeshPhongMaterial( { color: 0xffffff } );
+        var cube_mat = new MeshPhongMaterial( { color: 0xffffff, opacity : 1, transparent : true } );
 
         for (var i = 0; i < maxCount; i ++) {
             for (var j = 0; j < maxCount; j ++) {
@@ -181,12 +218,14 @@ $(function(){
                     //Notice the second parameter of the material
 
                     outline = new Mesh(outline_geo, outline_mat);
+                    outline.renderOrder = -1000;
                     //Scale the object up to have an outline (as discussed in previous answer)
                     outline.scale.multiplyScalar(1.1);
                     //Scale the object up to have an outline (as discussed in previous answer)
-
-
                     sphereArray[index].add(outline);
+
+                    // var wireframe = new LineSegments( line_geo, line_mat );
+                    // sphereArray[index].add( wireframe );
 
                     sphereGoToColorArray[index] = cube_mat.color;
 
@@ -415,9 +454,8 @@ $(function(){
 
         composer = new EffectComposer(renderer);
 
-        var loader = new ImageLoader();
-        searchImage = loader.load(SMAAEffect.searchImageDataURL);
-        areaImage = loader.load(SMAAEffect.areaImageDataURL);
+
+
 
         smaaEffect = new SMAAEffect(searchImage, areaImage);
 
@@ -477,7 +515,7 @@ $(function(){
 
             camera2.aspect = window.innerWidth / window.innerHeight;
             camera2.updateProjectionMatrix();
-            renderer2.setSize(window.innerWidth, window.innerHeight * 0.8);
+            renderer2.setSize(window.innerWidth, mainEl.outerHeight(true));
             composer.setSize( window.innerWidth, window.innerHeight );
             render();
         });
@@ -488,6 +526,9 @@ $(function(){
     function finishLoading() {
         insertThreeJSCanvas();
         setTimeout(function() {
+            innerBar.css("height", (70 / totalWorksCount) + "vh");
+
+            $("#grain").fadeTo(1000, 1);
             $("#spinner").fadeOut(500, function() {
                 isInMainScreen = true;
                 $("#actualBody").fadeTo(1000, 1);
@@ -617,6 +658,9 @@ $(function(){
     function scrollListDown() {
         if (!isListBeingScrolled && curCss3dObjIndex < css3dObjArray.length - 1) {
             isListBeingScrolled = true;
+
+            innerBar.css("top", (100 * (curCss3dObjIndex + 1 ) / totalWorksCount) + "%");
+
             new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
                 .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
                 .easing(TWEEN.Easing.Cubic.Out)
@@ -640,6 +684,9 @@ $(function(){
 
     function scrollListUp() {
         if (!isListBeingScrolled && curCss3dObjIndex > 0) {
+
+            innerBar.css("top", (100 * (curCss3dObjIndex - 1 ) / totalWorksCount) + "%");
+
             isListBeingScrolled = true;
             new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
                 .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
@@ -722,7 +769,7 @@ $(function(){
                 .start();
 
             new TWEEN.Tween(outline.material)
-                .to({opacity: 1}, 500)
+                .to({opacity : 0}, 500)
                 .start();
 
         }
@@ -758,7 +805,35 @@ $(function(){
             new TWEEN.Tween(dotScreenEffect.blendMode.opacity)
                 .to({value: 1.0}, 500).start();
 
-            new TWEEN.Tween(outline.material).to({opacity: 0}, 500).start();
+            new TWEEN.Tween(outline.material).to({opacity: 1}, 500).start();
         }
     }
+
+    $("#navHome").on("click", function(event) {
+        event.preventDefault();
+        $(this).addClass("active");
+        $("#navWorks").removeClass("active");
+        $("#navContact").removeClass("active");
+        $(".workContainer").hide(1000);
+        $(".outerBar").css("opacity", 0);
+    });
+
+    $("#navWorks").on("click", function(event) {
+        event.preventDefault();
+        $(this).addClass("active");
+        $("#navHome").removeClass("active");
+        $("#navContact").removeClass("active");
+        $(".workContainer").show(1000);
+        $(".outerBar").css("opacity", 1);
+    });
+
+    $("#navContact").on("click", function(event) {
+        event.preventDefault();
+        $(this).addClass("active");
+        $("#navWorks").removeClass("active");
+        $("#navHome").removeClass("active");
+        $(".workContainer").hide(1000);
+        $(".outerBar").css("opacity", 0);
+    });
+
 });

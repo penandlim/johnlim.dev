@@ -5,7 +5,6 @@ const DynamicCdnWebpackPlugin = require('dynamic-cdn-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
 
-
 module.exports = {
     entry: './src/index.js',
     output: {
@@ -13,7 +12,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist')
     },
     devServer: {
-        contentBase: 'src/', //disk location
+        contentBase: 'dist/', //disk location
         watchContentBase: true
     },
     module: {

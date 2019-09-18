@@ -2,9 +2,9 @@
   "works":[
     {
       "title":"johnlim.dev",
-      "previewType":"youtube",
-      "previewSrc":"https://www.youtube.com/embed/9ZxZqTMnBYk",
-      "descriptionText":"Personal website featuring past works.",
+      "previewType":"video",
+      "previewSrc":"videos/johnlimdev.webm",
+      "descriptionText":"My personal website featuring some of the works.",
       "keywords":[
         {
           "type":"frontend",
@@ -23,8 +23,12 @@
           "keyword":"AWS S3"
         },
         {
+          "type":"backend",
+          "keyword":"Node.js"
+        },
+        {
           "type":"other",
-          "keyword":"Webpack"
+          "keyword":"Webpack 4"
         },
         {
           "type":"other",
@@ -33,39 +37,46 @@
       ],
       "links":{
         "direct":"https://johnlim.dev",
-        "github":"https://github.com"
+        "github":"https://github.com/penandlim"
       }
     },
     {
-      "title":"johnlim.dev2",
+      "title":"IconStory Online",
       "previewType":"youtube",
-      "previewSrc":"https://www.youtube.com/embed/9ZxZqTMnBYk",
-      "descriptionText":"Personal website featuring past works.",
+      "previewSrc":"https://www.youtube.com/embed/nnN_OijYp08",
+      "descriptionText":"Community online journal website built on ICON Blockchain Network.",
       "keywords":[
         {
           "type":"frontend",
-          "keyword":"three.js"
-        },
-        {
-          "type":"frontend",
-          "keyword":"React.js"
-        },
-        {
-          "type":"frontend",
-          "keyword":"Bootstrap"
+          "keyword":"anime.js"
         },
         {
           "type":"backend",
-          "keyword":"AWS S3"
+          "keyword":"Heroku"
+        },
+        {
+          "type":"backend",
+          "keyword":"Node.js"
+        },
+        {
+          "type":"backend",
+          "keyword":"socket.io"
+        },
+        {
+          "type":"backend",
+          "keyword":"Smart Contract"
         },
         {
           "type":"other",
-          "keyword":"Shader programming"
+          "keyword":"Blockchain"
+        },
+        {
+          "type":"other",
+          "keyword":"Twitter integration"
         }
       ],
       "links":{
-        "direct":"https://johnlim.dev",
-        "github":"https://github.com"
+        "direct":"https://iconstory.online"
       }
     }
 

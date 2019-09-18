@@ -11,8 +11,10 @@
     <link rel="stylesheet" href="css/fontawesome.all.min.css">
 </head>
 
-<body class="text-center">
+<body id="body" class="text-center">
+<div id="grain" class="centered">
 
+</div>
 
 <div id="actualBody" class="cover-container d-flex h-100 p-4 mx-auto flex-column" style="opacity: 0;">
 
@@ -23,9 +25,9 @@
   </span><div class="slider"></div></h2>
 
             <nav class="nav nav-masthead justify-content-center" style="opacity: 0;">
-                <a class="nav-link active" href="#">Home</a>
-                <a class="nav-link" href="#">Works</a>
-                <a class="nav-link" href="#">Contact</a>
+                <a id="navHome" class="nav-link active" href="#">Home</a>
+                <a id="navWorks" class="nav-link" href="#">Works</a>
+                <a id="navContact" class="nav-link" href="#">Contact</a>
             </nav>
         </div>
     </header>
@@ -55,7 +57,9 @@
 <div id="threejs" class="centered" style="opacity: 0"></div>
 
 <div id="root"></div>
-
+<div class="outerBar">
+    <div class="innerBar"></div>
+</div>
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->

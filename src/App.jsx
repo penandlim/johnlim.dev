@@ -23,12 +23,25 @@ class PreviewYoutube extends React.Component {
     }
 }
 
+class PreviewVideo extends React.Component {
+    render() {
+        return (
+            <video width="480" height="270" autoPlay loop muted>
+                <source src={this.props.previewSrc} type="video/mp4" />
+                    Your browser does not support the video tag.
+            </video>
+        );
+    }
+}
+
 class Preview extends React.Component {
 // Use the render function to return JSX component
     render() {
         var previewContent;
         if (this.props.type === "youtube") {
             previewContent = <PreviewYoutube previewSrc={this.props.previewSrc} />;
+        } else if (this.props.type === "video") {
+            previewContent = <PreviewVideo previewSrc={this.props.previewSrc} />
         }
 
         return (
