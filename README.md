@@ -7,6 +7,7 @@ My personal website featuring some of my past works and projects.
 Generate dist folder by running the following command.
 
 ```bash
+npm install
 npm run build
 ```
 
