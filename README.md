@@ -20,7 +20,7 @@ All necessary files will be packed and copied from src/ to dist/
 ## Built With
 
 * [three.js](https://github.com/mrdoob/three.js/) - Displays 3D Models on the website.
-* [React](https://reactjs.org/) - Used to parse and load the list of past works from [works.json](works.json).
+* [React](https://reactjs.org/) - Used to parse and load the list of past works from [works.json](src/works.json).
 * [Bootstrap 4](https://github.com/twbs/bootstrap) - Used the base css for supporting desktop, mobile, and tablet resolutions.
 * [Webpack](https://github.com/webpack/webpack) - Tree shaking & packing resources for production.
 
