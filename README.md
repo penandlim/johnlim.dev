@@ -2,9 +2,13 @@
 
 My personal website featuring some of my past works and projects.
 
+## Prerequisites
+
+* [Node](https://nodejs.org/en/)
+
 ## Deployment
 
-Generate dist folder by running the following command.
+Install all required packages and generate dist folder by running the following commands.
 
 ```bash
 npm install
