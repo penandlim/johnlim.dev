@@ -4,20 +4,20 @@ import anime from 'animejs/lib/anime.es';
 import TWEEN from '@tweenjs/tween.js';
 import {
     BackSide,
-    BoxGeometry, BufferGeometry,
+    BoxGeometry,
     Color,
-    DirectionalLight, EdgesGeometry,
-    ImageLoader, LineSegments,
+    DirectionalLight,
+    ImageLoader,
     Mesh,
     MeshBasicMaterial,
     MeshPhongMaterial, Object3D, PerspectiveCamera, Scene, Vector2,
-    Vector3, WebGLRenderer, WireframeGeometry
+    Vector3, WebGLRenderer
 } from "three";
 
 import { EffectComposer, SMAAEffect, BlendFunction, DotScreenEffect, EffectPass, RenderPass } from 'postprocessing/build/postprocessing.esm';
 import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
-import { Wireframe } from 'three/examples/jsm/lines/Wireframe.js';
-import { WireframeGeometry2 } from 'three/examples/jsm/lines/WireframeGeometry2.js';
+// import { Wireframe } from 'three/examples/jsm/lines/Wireframe.js';
+// import { WireframeGeometry2 } from 'three/examples/jsm/lines/WireframeGeometry2.js';
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
