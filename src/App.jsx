@@ -16,7 +16,7 @@ class PreviewYoutube extends React.Component {
 // Use the render function to return JSX component
     render() {
         return (
-            <iframe className="youtubePreview" width="480" height="270" src={this.props.previewSrc}
+            <iframe className="videoPreview" src={this.props.previewSrc}
                     style={{display: "inline"}} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen>
             </iframe>
         );
@@ -26,7 +26,7 @@ class PreviewYoutube extends React.Component {
 class PreviewVideo extends React.Component {
     render() {
         return (
-            <video className="videoPreview" width="480" height="270" autoPlay loop muted>
+            <video className="videoPreview" autoPlay loop muted>
                 <source src={this.props.previewSrc} type="video/mp4" />
                     Your browser does not support the video tag.
             </video>

@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import anime from 'animejs/lib/anime.es';
 import TWEEN from '@tweenjs/tween.js';
 import {
-    BackSide,
     BoxGeometry,
     Color,
     DirectionalLight,
@@ -13,22 +12,17 @@ import {
     MeshPhongMaterial, Object3D, PerspectiveCamera, Scene, Vector2,
     Vector3, WebGLRenderer
 } from "three";
+import * as THREE from 'three/src/constants';
 
 import { EffectComposer, SMAAEffect, BlendFunction, DotScreenEffect, EffectPass, RenderPass } from 'postprocessing/build/postprocessing.esm';
 import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
-// import { Wireframe } from 'three/examples/jsm/lines/Wireframe.js';
-// import { WireframeGeometry2 } from 'three/examples/jsm/lines/WireframeGeometry2.js';
-
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { App } from './App.jsx';
 import 'loaders.css/loaders.min.css';
 
 import './css/index.css';
-
 import "grained";
-
-
 
 // export for others scripts to use
 window.$ = $;
@@ -43,6 +37,22 @@ var sphereGoToColorArray = [];
 var sphereSmallCubePosArray = [];
 var sphereSizeArray = [];
 var sphereRotArray = [];
+
+var githubIconPosArray = [];
+var githubIconScaleArray = [];
+var githubIconGroup = new Object3D();
+
+var linkedinIconPosArray = [];
+var linkedinIconScaleArray = [];
+var linkedinIconGroup = new Object3D();
+
+var facebookIconPosArray = [];
+var facebookIconScaleArray = [];
+var facebookIconGroup = new Object3D();
+
+var twitterIconPosArray = [];
+var twitterIconScaleArray = [];
+var twitterIconGroup = new Object3D();
 
 var wireframeArray = [];
 
@@ -61,7 +71,6 @@ var nextCam2Pos = new Vector2(0, 0);
 
 var isMouseDownOnEmpty = false;
 var isInMainScreen = false;
-
 
 var triggerRandomAnimationTimeout;
 var dotScreenEffect;
@@ -98,6 +107,15 @@ var totalWorksCount;
 
 var innerBar, outerBar;
 
+var workContainers;
+
+const WindowStates = {
+    HOME: 0,
+    WORKS: 1,
+    CONTACT: 2,
+};
+
+var currentWindowState = WindowStates.HOME;
 
 $(function(){
 
@@ -130,9 +148,6 @@ $(function(){
             // handle your errors here
             console.error(error)
         });
-
-
-
 
     var textWrapper = document.querySelector('.letters');
     textWrapper.innerHTML = textWrapper.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
@@ -192,7 +207,12 @@ $(function(){
         var maxCount = 10;
         var perGap = 0.4;
 
-        outline_mat = new MeshBasicMaterial({color : 0x000000, transparent : true, opacity: 1,  side: BackSide, depthTest : false});
+        outline_mat = new MeshBasicMaterial({color : 0x000000, transparent : true, opacity: 1,  side: THREE.BackSide, depthTest : false});
+        outline_mat.blending = THREE.CustomBlending;
+        outline_mat.blendEquation = THREE.MaxEquation;
+        outline_mat.blendSrc = THREE.SrcAlphaFactor; //default
+        outline_mat.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+
         var cube_geo = new BoxGeometry(  0.05, 0.05, 0.05  );
         var outline_geo = cube_geo.clone();
         var cube_mat = new MeshPhongMaterial( { color: 0xffffff, opacity : 1, transparent : true } );
@@ -327,8 +347,6 @@ $(function(){
             }, 10000);
         }
 
-
-
         AnimToComplexTrigger = true;
         function AnimToComplexCube() {
             console.log("Animating to Complex cube");
@@ -416,10 +434,6 @@ $(function(){
             }, 10000);
         }
 
-
-
-
-
         function UpdateVertexPos(delta) {
             for (var i = 0; i < maxCount; i ++) {
                 for (var j = 0; j < maxCount; j ++) {
@@ -429,13 +443,11 @@ $(function(){
                         sphereArray[index].position.copy(Vector3Lerp(sphereArray[index].position, sphereGoToPosArray[index], delta * speedMultiplier + i * 0.001 ));
                         sphereArray[index].scale.copy( Vector3Lerp(sphereArray[index].scale, sphereSizeArray[index], delta * speedMultiplier + i * 0.001 ) );
                         sphereArray[index].rotation.setFromVector3(Vector3Lerp(sphereArray[index].rotation.toVector3(), sphereRotArray[index], delta * speedMultiplier + i * 0.001 ), "YXZ");
-
                         sphereArray[index].material.color.copy( ColorLerp(sphereArray[index].material.color, sphereGoToColorArray[index], delta));
 
                     }
                 }
             }
-
 
             var newCamPos = Vector3Lerp(camera.position, nextCamPos, delta * 2);
             camera.position.set(newCamPos.x, newCamPos.y, camera.position.z);
@@ -447,15 +459,9 @@ $(function(){
             for (let i = 0; i < css3dObjArray.length; i++) {
                 css3dObjArray[i].rotation.setFromVector3(Vector3Lerp(css3dObjArray[i].rotation.toVector3(), css3dObjNextRot, delta * 3));
             }
-
-
         }
 
-
         composer = new EffectComposer(renderer);
-
-
-
 
         smaaEffect = new SMAAEffect(searchImage, areaImage);
 
@@ -465,13 +471,11 @@ $(function(){
             angle: Math.PI * 0.55
         });
 
-
         const effectPass = new EffectPass(camera , smaaEffect , dotScreenEffect  );
         effectPass.renderToScreen = true;
 
         composer.addPass(new RenderPass(scene, camera));
         composer.addPass(effectPass);
-
 
         function animate(now) {
             requestAnimationFrame( animate );
@@ -521,12 +525,12 @@ $(function(){
         });
     }
 
-
-
     function finishLoading() {
         insertThreeJSCanvas();
         setTimeout(function() {
             innerBar.css("height", (70 / totalWorksCount) + "vh");
+
+            workContainers = $(".workContainer");
 
             $("#grain").fadeTo(1000, 1);
             $("#spinner").fadeOut(500, function() {
@@ -558,9 +562,6 @@ $(function(){
                     .start(); // Start the tween immediately.
             });
 
-
-
-
         }, 2000);
     }
 
@@ -587,7 +588,6 @@ $(function(){
                     break;
             }
         }
-
     }
 
     function getTween(b, e, i) {
@@ -618,7 +618,6 @@ $(function(){
     }
 
     function render(delta) {
-
         composer.render(delta);
         renderer2.render(scene2, camera2);
         // stats.update();
@@ -729,11 +728,7 @@ $(function(){
         css3dObjNextRot.y = mouse.x * 0.3;
     }
 
-
-
     function onMouseDown(event) {
-
-
         // Check if user clicked on empty space.
         var target = $(event.target);
         var targetName = target.prop("tagName");
@@ -773,8 +768,6 @@ $(function(){
                 .start();
 
         }
-
-
     }
 
     function onMouseUp(event) {
@@ -787,7 +780,6 @@ $(function(){
             }
 
             $(document.body).css("background-color", "#f1f2f3");
-
 
             ToggleRandomAnimation(currentAnimationIndex);
 
@@ -811,29 +803,98 @@ $(function(){
 
     $("#navHome").on("click", function(event) {
         event.preventDefault();
+
+        if (currentWindowState === WindowStates.CONTACT) {
+            TransitionFromContact();
+        }
+        currentWindowState = WindowStates.HOME;
+
         $(this).addClass("active");
         $("#navWorks").removeClass("active");
         $("#navContact").removeClass("active");
-        $(".workContainer").hide(1000);
+        workContainers.stop();
+        workContainers.hide(1000);
         $(".outerBar").css("opacity", 0);
     });
 
     $("#navWorks").on("click", function(event) {
         event.preventDefault();
+
+        if (currentWindowState === WindowStates.CONTACT) {
+            TransitionFromContact();
+        }
+        currentWindowState = WindowStates.WORKS;
+
         $(this).addClass("active");
         $("#navHome").removeClass("active");
         $("#navContact").removeClass("active");
-        $(".workContainer").show(1000);
+        workContainers.stop();
+        workContainers.show(1000);
         $(".outerBar").css("opacity", 1);
-    });
+});
 
     $("#navContact").on("click", function(event) {
+        currentWindowState = WindowStates.CONTACT;
         event.preventDefault();
         $(this).addClass("active");
         $("#navWorks").removeClass("active");
         $("#navHome").removeClass("active");
-        $(".workContainer").hide(1000);
+        workContainers.stop();
+        workContainers.hide(1000);
         $(".outerBar").css("opacity", 0);
+
+        TransitionToContact();
     });
+
+    function TransitionToContact() {
+        var children = sphereGroup.children;
+
+        for (let i = sphereGroup.children.length - 1 ; i > -1; i--) {
+            var groupToAddTo;
+            if (i < 250) {
+                groupToAddTo = githubIconGroup;
+            } else if (i > 249 && i < 500) {
+                groupToAddTo = linkedinIconGroup;
+            } else if (i > 499 && i < 750) {
+                groupToAddTo = facebookIconGroup;
+            } else {
+                groupToAddTo = twitterIconGroup;
+            }
+            let targetObj = children[i];
+            sphereGroup.remove(targetObj);
+            groupToAddTo.add(targetObj);
+        }
+
+    }
+
+    function TransitionFromContact() {
+        var children = githubIconGroup.children;
+        for (let i = 249; i > -1; i--) {
+            let tempObj = children[i];
+            githubIconGroup.remove(tempObj);
+            sphereGroup.add(tempObj);
+        }
+
+        children = facebookIconGroup.children;
+        for (let i = 249; i > -1; i--) {
+            let tempObj = children[i];
+            facebookIconGroup.remove(tempObj);
+            sphereGroup.add(tempObj);
+        }
+
+        children = linkedinIconGroup.children;
+        for (let i = 249; i > -1; i--) {
+            let tempObj = children[i];
+            linkedinIconGroup.remove(tempObj);
+            sphereGroup.add(tempObj);
+        }
+
+        children = twitterIconGroup.children;
+        for (let i = 249; i > -1; i--) {
+            let tempObj = children[i];
+            twitterIconGroup.remove(tempObj);
+            sphereGroup.add(tempObj);
+        }
+    }
 
 });

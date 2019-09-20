@@ -78,6 +78,46 @@
       "links":{
         "direct":"https://iconstory.online"
       }
+    },
+    {
+      "title":"EtherWords.io",
+      "previewType":"youtube",
+      "previewSrc":"https://www.youtube.com/embed/nnN_OijYp08",
+      "descriptionText":"Ethereum DApp inspired by CryptoKitties. Buy and sell words on the website with Ethereum",
+      "keywords":[
+        {
+          "type":"frontend",
+          "keyword":"Bootstrap"
+        },
+        {
+          "type":"frontend",
+          "keyword":"web3.js"
+        },
+        {
+          "type":"backend",
+          "keyword":"AWS EB"
+        },
+        {
+          "type":"backend",
+          "keyword":"Node.js"
+        },
+        {
+          "type":"backend",
+          "keyword":"Ethereum Smart Contract"
+        },
+        {
+          "type":"other",
+          "keyword":"Blockchain"
+        },
+        {
+          "type":"other",
+          "keyword":"Solidarity"
+        }
+      ],
+      "links":{
+        "direct":"https://etherwords.io",
+        "github":"https://github.com"
+      }
     }
 
   ]
