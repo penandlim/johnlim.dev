@@ -110,7 +110,7 @@ class WorkContainer extends React.Component {
 // Use the render function to return JSX component
     render() {
         return (
-            <div className="workContainer w-100 something">
+            <div className="workContainer something">
                 <Title title={this.props.json.title}/>
                 <Preview type={this.props.json.previewType} previewSrc={this.props.json.previewSrc} />
                 <Description descriptionText={this.props.json.descriptionText} keywords={this.props.json.keywords}/>

@@ -178,8 +178,8 @@ $(function(){
         $(".workContainer").each(function(index) {
             div = new CSS3DObject(this);
             div.position.x = 0;
-            div.position.y = 100 - index * 1000;
-            div.position.z = -600;
+            div.position.y = - index * 1000;
+            div.position.z = -500;
             css3dObjGroup.add(div);
             css3dObjArray.push(div);
         });
