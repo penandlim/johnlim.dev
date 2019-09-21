@@ -169,7 +169,7 @@ $(function(){
         //CSS3D Scene
         scene2 = new Scene();
         renderer2 = new CSS3DRenderer();
-        renderer2.setSize(window.innerWidth, mainEl.outerHeight(true));
+        renderer2.setSize( window.innerWidth, window.innerHeight );
         renderer2.domElement.className += " css3d centered";
         document.body.appendChild(renderer2.domElement);
 
@@ -519,7 +519,7 @@ $(function(){
 
             camera2.aspect = window.innerWidth / window.innerHeight;
             camera2.updateProjectionMatrix();
-            renderer2.setSize(window.innerWidth, mainEl.outerHeight(true));
+            renderer2.setSize( window.innerWidth, window.innerHeight );
             composer.setSize( window.innerWidth, window.innerHeight );
             render();
         });
