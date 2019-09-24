@@ -1045,11 +1045,12 @@ $(function(){
             } else {
                 TWEEN.remove(tweenZoomAction);
             }
-            $(document.body).css("background-color", "#ffd2d3");
+
 
             clearTimeout(triggerRandomAnimationTimeout);
 
             if (currentWindowState === WindowStates.HOME) {
+                $(document.body).css("background-color", "#ffd2d3");
 
             } else if (currentWindowState === WindowStates.WORKS) {
 
