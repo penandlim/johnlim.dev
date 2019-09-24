@@ -125,7 +125,7 @@ export class App extends React.Component {
         const works = this.props.parsedJsonData.map((json) => <WorkContainer json={json} key={json.title} />);
 
         return(
-            <div>
+            <div className="workContainerContainer">
                 {works}
             </div>
         );
