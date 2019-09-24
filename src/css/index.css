@@ -309,4 +309,6 @@ iframe {
     padding-top: 56.25%;
 }
 
-/*TODO Flexbox z-index? why isnt z-index working with the top bar?*/
+.pointer {
+    cursor: pointer;
+}
