@@ -41,7 +41,9 @@ window.jQuery = jQuery;
 
 let renderer, scene, camera, cube, then, composer, camera2, scene2, renderer2;
 let sphereArray = [];
-let sphereGroup;
+let sphereGroup = new Object3D();
+window.sphereGroup = sphereGroup;
+
 let sphereBigCubePosArray = [];
 let sphereGoToPosArray = [];
 let sphereGoToColorArray = [];
@@ -188,6 +190,8 @@ const body = $("#body");
 let linkToOpen = "";
 
 let topArrow, bottomArrow;
+
+let AnimToComplexCubeFn;
 
 $(function(){
 
@@ -360,7 +364,7 @@ $(function(){
 
 
 
-        sphereGroup = new Object3D();
+
 
         var maxCount = 10;
         var perGap = 0.4;
@@ -442,7 +446,7 @@ $(function(){
         scene.add( sphereGroup );
         scene.add(githubIconGroup, linkedinIconGroup, facebookIconGroup, twitterIconGroup);
         sphereGroup.scale.set(0.01, 0.01, 0.01);
-        sphereGroup.position.set(sphereGroup.position.x, sphereGroup.position.y - 0.1, sphereGroup.position.z);
+        sphereGroup.position.set(sphereGroup.position.x, sphereGroup.position.y - 0.3, sphereGroup.position.z);
 
 
 
@@ -531,7 +535,7 @@ $(function(){
         }
 
         AnimToComplexTrigger = true;
-        function AnimToComplexCube() {
+        function AnimToComplexCube(stopAnimation = false) {
             console.log("Animating to Complex cube");
             shuffle(sphereComplexRotArray, sphereComplexScaleArray, sphereComplexPosArray);
             for (var i = 0; i < maxCount; i ++) {
@@ -579,11 +583,14 @@ $(function(){
             AnimToComplexTrigger = false;
 
             currentAnimationIndex = 2;
-            clearTimeout(triggerRandomAnimationTimeout);
-            triggerRandomAnimationTimeout = setTimeout(function() {
-                ToggleRandomAnimation();
-            }, 10000);
+            if (!stopAnimation) {
+                clearTimeout(triggerRandomAnimationTimeout);
+                triggerRandomAnimationTimeout = setTimeout(function () {
+                    ToggleRandomAnimation();
+                }, 10000);
+            }
         }
+        AnimToComplexCubeFn = AnimToComplexCube;
 
         AnimToRingTrigger = false;
         function AnimToRing() {
@@ -632,8 +639,15 @@ $(function(){
                             sphereArray[index].position.lerp(newPos, delta * speedMultiplier + i * 0.001);
                             sphereArray[index].scale.lerp(newScale, delta * speedMultiplier + i * 0.001);
                             sphereArray[index].rotation.setFromVector3(sphereArray[index].rotation.toVector3().lerp(sphereRotArray[index], delta * speedMultiplier + i * 0.001), "YXZ");
-                            sphereArray[index].material.color.lerp(sphereGoToColorArray[index], delta);
+                            // sphereArray[index].material.color.lerp(sphereGoToColorArray[index], delta);
                         } else if (currentWindowState === WindowStates.WORKS) {
+                            const newPos = sphereGoToPosArray[index].clone().multiplyScalar(sphereGroupModifier.pos);
+                            const newScale = sphereSizeArray[index].clone().multiplyScalar(sphereArray[index].userData.scaleMultiplier);
+
+                            sphereArray[index].position.lerp(newPos, delta * speedMultiplier + i * 0.001);
+                            sphereArray[index].scale.lerp(newScale, delta * speedMultiplier + i * 0.001);
+                            sphereArray[index].rotation.setFromVector3(sphereArray[index].rotation.toVector3().lerp(sphereRotArray[index], delta * speedMultiplier + i * 0.001), "YXZ");
+                            // sphereArray[index].material.color.lerp(sphereGoToColorArray[index], delta);
 
                         } else if (currentWindowState === WindowStates.CONTACT) {
                             if (index < 250) {
@@ -684,8 +698,15 @@ $(function(){
             }
 
             if (currentWindowState === WindowStates.HOME) {
+                if (isMouseDownOnEmpty) {
+                    rotationSpeedMultiplier.y = getTween(rotationSpeedMultiplier.y, mouse.x * 3, delta * 5);
+                } else {
+                    rotationSpeedMultiplier.y = getTween(rotationSpeedMultiplier.y, 1, delta * 5);
+                }
                 sphereGroup.rotateY(delta * 0.5 * rotationSpeedMultiplier.y);
+
             } else if (currentWindowState === WindowStates.WORKS) {
+                sphereGroup.rotateY(delta * 0.5 * rotationSpeedMultiplier.y);
 
             } else if (currentWindowState === WindowStates.CONTACT) {
                 sphereGroup.rotation.setFromVector3(sphereGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
@@ -731,11 +752,7 @@ $(function(){
             const delta = now - then;
             then = now;
 
-            if (isMouseDownOnEmpty) {
-                rotationSpeedMultiplier.y = getTween(rotationSpeedMultiplier.y, mouse.x * 3, delta * 5);
-            } else {
-                rotationSpeedMultiplier.y = getTween(rotationSpeedMultiplier.y, 1, delta * 5);
-            }
+
 
 
             // sphereGroup.rotateZ(delta * 0.5);
@@ -1079,6 +1096,21 @@ $(function(){
             if (currentWindowState === WindowStates.HOME) {
                 $(document.body).css("background-color", "#ffd2d3");
 
+                if ( outline.userData.tween ) {
+                    TWEEN.remove( outline.userData.tween );
+                }
+                outline.userData.tween = new TWEEN.Tween(outline.material)
+                    .to({opacity : 0}, 500)
+                    .start();
+
+                if (sphereGroupModifierTween) {
+                    TWEEN.remove(sphereGroupModifierTween);
+                }
+                sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
+                    .to({pos: 1.5}, 100)
+                    .easing(TWEEN.Easing.Cubic.Out)
+                    .start();
+
             } else if (currentWindowState === WindowStates.WORKS) {
 
             } else {
@@ -1096,23 +1128,15 @@ $(function(){
             //     })
             //     .start(); // Start the tween immediately.
 
-            if (sphereGroupModifierTween) {
-                TWEEN.remove(sphereGroupModifierTween);
-            }
 
-            sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
-                .to({pos: 1.5}, 100)
-                .easing(TWEEN.Easing.Cubic.Out)
-                .start();
 
             // new TWEEN.Tween(dotScreenEffect.blendMode.opacity)
             //     .to({value: 0.0}, 500)
             //     .easing(TWEEN.Easing.Cubic.Out)
             //     .start();
 
-            new TWEEN.Tween(outline.material)
-                .to({opacity : 0}, 500)
-                .start();
+
+
 
             speedMultiplier = 5;
 
@@ -1140,6 +1164,21 @@ $(function(){
                 triggerRandomAnimationTimeout = setTimeout(function() {
                     ToggleRandomAnimation();
                 }, 5000);
+
+                if ( outline.userData.tween ) {
+                    TWEEN.remove( outline.userData.tween );
+                }
+                outline.userData.tween = new TWEEN.Tween(outline.material).to({opacity: 1}, 500).start();
+
+                if (sphereGroupModifierTween) {
+                    TWEEN.remove(sphereGroupModifierTween);
+                }
+
+                sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
+                    .to({pos: 1}, 100)
+                    .easing(TWEEN.Easing.Cubic.Out)
+                    .start();
+
             } else if (currentWindowState === WindowStates.WORKS) {
 
             } else {
@@ -1154,35 +1193,10 @@ $(function(){
 
 
 
-
-
-
-
-
-            // var objToTween = {z: camera.position.z, fov: camera.fov};
-            // tweenZoomAction = new TWEEN.Tween(objToTween) // Create a new tween that modifies 'coords'.
-            //     .to({z: 5, fov: 75}, 700) // Move to (300, 200) in 1 second.
-            //     .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
-            //     .onUpdate(() => { // Called after tween.js updates 'coords'.
-            //         camera.position.set(camera.position.x, camera.position.y, objToTween.z);
-            //         camera.fov = objToTween.fov;
-            //         camera.updateProjectionMatrix();
-            //     })
-            //     .start(); // Start the tween immediately.
-
-            if (sphereGroupModifierTween) {
-                TWEEN.remove(sphereGroupModifierTween);
-            }
-
-            sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
-                .to({pos: 1}, 100)
-                .easing(TWEEN.Easing.Cubic.Out)
-                .start();
-
             // new TWEEN.Tween(dotScreenEffect.blendMode.opacity)
             //     .to({value: 1.0}, 500).start();
 
-            new TWEEN.Tween(outline.material).to({opacity: 1}, 500).start();
+
         }
     }
 
@@ -1191,6 +1205,8 @@ $(function(){
 
         if (currentWindowState === WindowStates.CONTACT) {
             TransitionFromContact();
+        } else if (currentWindowState === WindowStates.WORKS) {
+            TransitionFromWorks();
         }
         currentWindowState = WindowStates.HOME;
 
@@ -1203,6 +1219,11 @@ $(function(){
         });
 
         $(".outerBar").css("opacity", 0);
+
+        clearTimeout(triggerRandomAnimationTimeout);
+        triggerRandomAnimationTimeout = setTimeout(function () {
+            ToggleRandomAnimation();
+        }, 5000);
     });
 
     $("#navWorks").on("click", function(event) {
@@ -1220,9 +1241,16 @@ $(function(){
         workContainers.css("margin-top", "0px");
         workContainers.fadeTo(300, 1);
         $(".outerBar").css("opacity", 1);
+
+        TransitionToWorks();
 });
 
     $("#navContact").on("click", function(event) {
+
+        if (currentWindowState === WindowStates.WORKS) {
+            TransitionFromWorks();
+        }
+
         currentWindowState = WindowStates.CONTACT;
         event.preventDefault();
         $(this).addClass("active");
@@ -1279,10 +1307,6 @@ $(function(){
                 .start(); // Start the tween immediately.
         }
 
-        triggerRandomAnimationTimeout = setTimeout(function() {
-            ToggleRandomAnimation();
-        }, 5000);
-
         for (let i = 0; i < 250; i++) {
             githubIconGroup.remove(sphereArray[i]);
             sphereGroup.add(sphereArray[i]);
@@ -1302,6 +1326,81 @@ $(function(){
             twitterIconGroup.remove(sphereArray[i]);
             sphereGroup.add(sphereArray[i]);
         }
+    }
+
+    function TransitionToWorks() {
+        clearTimeout(triggerRandomAnimationTimeout);
+
+        sphereArray[0].material.wireframe = true;
+        sphereArray[0].material.color.set(0x000000);
+        sphereArray[0].material.opacity = 0.1;
+        sphereArray[250].material.wireframe = true;
+        sphereArray[250].material.color.set(0x000000);
+        sphereArray[250].material.opacity = 0.1;
+        sphereArray[500].material.wireframe = true;
+        sphereArray[500].material.color.set(0x000000);
+        sphereArray[500].material.opacity = 0.1;
+        sphereArray[750].material.wireframe = true;
+        sphereArray[750].material.color.set(0x000000);
+        sphereArray[750].material.opacity = 0.1;
+        if ( outline.userData.tween ) {
+            TWEEN.remove( outline.userData.tween );
+        }
+        outline.material.opacity = 0;
+
+        if (sphereGroupModifierTween) {
+            TWEEN.remove(sphereGroupModifierTween);
+        }
+        sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
+            .to({pos: 1.5}, 100)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .start();
+
+        AnimToComplexTrigger = true;
+
+        if (css3dObjArray[curCss3dObjIndex].userData.tween) {
+            TWEEN.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
+        }
+        css3dObjArray[curCss3dObjIndex].scale.set(0.0001, 0.0001, 0.0001);
+        css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+            .to({x: 1, y: 1, z: 1}, 800)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .start();
+    }
+
+    function TransitionFromWorks() {
+        sphereArray[0].material.wireframe = false;
+        sphereArray[0].material.color.set(0xffffff);
+        sphereArray[0].material.opacity = 1;
+        sphereArray[250].material.wireframe = false;
+        sphereArray[250].material.color.set(0xffffff);
+        sphereArray[250].material.opacity = 1;
+        sphereArray[500].material.wireframe = false;
+        sphereArray[500].material.color.set(0xffffff);
+        sphereArray[500].material.opacity = 1;
+        sphereArray[750].material.wireframe = false;
+        sphereArray[750].material.color.set(0xffffff);
+        sphereArray[750].material.opacity = 1;
+        if ( outline.userData.tween ) {
+            TWEEN.remove( outline.userData.tween );
+        }
+        outline.userData.tween = new TWEEN.Tween(outline.material).to({opacity: 1}, 100).start();
+
+        if (sphereGroupModifierTween) {
+            TWEEN.remove(sphereGroupModifierTween);
+        }
+        sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
+            .to({pos: 1}, 100)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .start();
+
+        if (css3dObjArray[curCss3dObjIndex].userData.tween) {
+            TWEEN.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
+        }
+        css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+            .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .start();
     }
 
     function pointerEventToXY(e){
