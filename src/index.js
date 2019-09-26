@@ -24,6 +24,17 @@ import 'loaders.css/loaders.min.css';
 import './css/index.css';
 import "grained";
 
+Object.defineProperty(Vector3.prototype, "lerpArray", {
+    value: function SayHi(toArray, i) {
+        this.setX(getTween(this.x, toArray[0], i));
+        this.setY(getTween(this.y, toArray[1], i));
+        this.setZ(getTween(this.z, toArray[2], i));
+        return this;
+    },
+    writable: true,
+    configurable: true
+});
+
 // export for others scripts to use
 window.$ = $;
 window.jQuery = jQuery;
@@ -92,7 +103,6 @@ let isListBeingScrolled = false;
 const rootElement = document.getElementById('root');
 
 const mainEl = $("main");
-let scrollBar;
 
 let totalWorksCount;
 
@@ -109,6 +119,7 @@ const WindowStates = {
 let currentWindowState = WindowStates.HOME;
 
 let sphereGroupModifier = {pos: 1};
+let sphereGroupModifierTween;
 
 let clickMousePos = {x: 0, y: 0};
 
@@ -128,7 +139,7 @@ const ringPosArray = [[1.25, 0.4340907335281372, 0.0], [1.2213640213012695, 0.43
 
 const githubIconPosArray = [[-8, -3, 0], [-8, -2, 0], [-8, -1, 0], [-8, 0, 0], [-8, 1, 0], [-8, 2, 0], [-7, -5, 0], [-7, -4, 0], [-7, -3, 0], [-7, -2, 0], [-7, -1, 0], [-7, 0, 0], [-7, 1, 0], [-7, 2, 0], [-7, 3, 0], [-7, 4, 0], [-6, -6, 0], [-6, -5, 0], [-6, -4, 0], [-6, -3, 0], [-6, -2, 0], [-6, -1, 0], [-6, 0, 0], [-6, 1, 0], [-6, 2, 0], [-6, 3, 0], [-6, 4, 0], [-6, 5, 0], [-5, -7, 0], [-5, -6, 0], [-5, -4, 0], [-5, -3, 0], [-5, 2, 0], [-5, 3, 0], [-5, 4, 0], [-5, 5, 0], [-5, 6, 0], [-4, -8, 0], [-4, -7, 0], [-4, -5, 0], [-4, -4, 0], [-4, 5, 0], [-4, 6, 0], [-3, -8, 0], [-3, -6, 0], [-3, -5, 0], [-3, -4, 0], [-3, 4, 0], [-3, 5, 0], [-3, 6, 0], [-3, 7, 0], [-2, -4, 0], [-2, 4, 0], [-2, 5, 0], [-2, 6, 0], [-2, 7, 0], [-1, 4, 0], [-1, 5, 0], [-1, 6, 0], [-1, 7, 0], [0, 4, 0], [0, 5, 0], [0, 6, 0], [0, 7, 0], [1, -4, 0], [1, 4, 0], [1, 5, 0], [1, 6, 0], [1, 7, 0], [2, -8, 0], [2, -7, 0], [2, -6, 0], [2, -5, 0], [2, -4, 0], [2, 4, 0], [2, 5, 0], [2, 6, 0], [2, 7, 0], [3, -8, 0], [3, -7, 0], [3, -6, 0], [3, -5, 0], [3, -4, 0], [3, 5, 0], [3, 6, 0], [4, -7, 0], [4, -6, 0], [4, -5, 0], [4, -4, 0], [4, -3, 0], [4, 2, 0], [4, 3, 0], [4, 4, 0], [4, 5, 0], [4, 6, 0], [5, -6, 0], [5, -5, 0], [5, -4, 0], [5, -3, 0], [5, -2, 0], [5, -1, 0], [5, 0, 0], [5, 1, 0], [5, 2, 0], [5, 3, 0], [5, 4, 0], [5, 5, 0], [6, -5, 0], [6, -4, 0], [6, -3, 0], [6, -2, 0], [6, -1, 0], [6, 0, 0], [6, 1, 0], [6, 2, 0], [6, 3, 0], [6, 4, 0], [7, -3, 0], [7, -2, 0], [7, -1, 0], [7, 0, 0], [7, 1, 0], [7, 2, 0] ];
 const githubIconMultiplier = 0.08;
-const githubIconPosOffset = [0, 2.4, 0];
+const githubIconPosOffset = [0, 2.2, 0];
 const githubIconScale = [1.6,1.6,1.6];
 for (let i = 0; i < githubIconPosArray.length; i++) {
     for (let j = 0; j < 3; j++) {
@@ -138,7 +149,7 @@ for (let i = 0; i < githubIconPosArray.length; i++) {
 
 const linkedinIconPosArray = [[-8, -8, 0], [-8, -7, 0], [-8, -6, 0], [-8, -5, 0], [-8, -4, 0], [-8, -3, 0], [-8, -2, 0], [-8, -1, 0], [-8, 0, 0], [-8, 1, 0], [-8, 2, 0], [-8, 5, 0], [-8, 6, 0], [-7, -8, 0], [-7, -7, 0], [-7, -6, 0], [-7, -5, 0], [-7, -4, 0], [-7, -3, 0], [-7, -2, 0], [-7, -1, 0], [-7, 0, 0], [-7, 1, 0], [-7, 2, 0], [-7, 4, 0], [-7, 5, 0], [-7, 6, 0], [-7, 7, 0], [-6, -8, 0], [-6, -7, 0], [-6, -6, 0], [-6, -5, 0], [-6, -4, 0], [-6, -3, 0], [-6, -2, 0], [-6, -1, 0], [-6, 0, 0], [-6, 1, 0], [-6, 2, 0], [-6, 4, 0], [-6, 5, 0], [-6, 6, 0], [-6, 7, 0], [-5, -8, 0], [-5, -7, 0], [-5, -6, 0], [-5, -5, 0], [-5, -4, 0], [-5, -3, 0], [-5, -2, 0], [-5, -1, 0], [-5, 0, 0], [-5, 1, 0], [-5, 2, 0], [-5, 5, 0], [-5, 6, 0], [-3, -8, 0], [-3, -7, 0], [-3, -6, 0], [-3, -5, 0], [-3, -4, 0], [-3, -3, 0], [-3, -2, 0], [-3, -1, 0], [-3, 0, 0], [-3, 1, 0], [-3, 2, 0], [-2, -8, 0], [-2, -7, 0], [-2, -6, 0], [-2, -5, 0], [-2, -4, 0], [-2, -3, 0], [-2, -2, 0], [-2, -1, 0], [-2, 0, 0], [-2, 1, 0], [-2, 2, 0], [-1, -8, 0], [-1, -7, 0], [-1, -6, 0], [-1, -5, 0], [-1, -4, 0], [-1, -3, 0], [-1, -2, 0], [-1, -1, 0], [-1, 0, 0], [-1, 1, 0], [-1, 2, 0], [0, -8, 0], [0, -7, 0], [0, -6, 0], [0, -5, 0], [0, -4, 0], [0, -3, 0], [0, -2, 0], [0, -1, 0], [0, 0, 0], [0, 1, 0], [0, 2, 0], [1, -1, 0], [1, 0, 0], [1, 1, 0], [2, 0, 0], [2, 1, 0], [2, 2, 0], [3, 0, 0], [3, 1, 0], [3, 2, 0], [4, -8, 0], [4, -7, 0], [4, -6, 0], [4, -5, 0], [4, -4, 0], [4, -3, 0], [4, -2, 0], [4, -1, 0], [4, 0, 0], [4, 1, 0], [4, 2, 0], [5, -8, 0], [5, -7, 0], [5, -6, 0], [5, -5, 0], [5, -4, 0], [5, -3, 0], [5, -2, 0], [5, -1, 0], [5, 0, 0], [5, 1, 0], [5, 2, 0], [6, -8, 0], [6, -7, 0], [6, -6, 0], [6, -5, 0], [6, -4, 0], [6, -3, 0], [6, -2, 0], [6, -1, 0], [6, 0, 0], [6, 1, 0], [7, -8, 0], [7, -7, 0], [7, -6, 0], [7, -5, 0], [7, -4, 0], [7, -3, 0], [7, -2, 0], [7, -1, 0], [7, 0, 0]];
 const linkedinIconPosMultiplier = 0.08;
-const linkedinIconPosOffset = [0, 0.8, 0];
+const linkedinIconPosOffset = [0, 0.6, 0];
 const linkedinIconScale = [1.6,1.6,1.6];
 for (let i = 0; i < linkedinIconPosArray.length; i++) {
     for (let j = 0; j < 3; j++) {
@@ -148,7 +159,7 @@ for (let i = 0; i < linkedinIconPosArray.length; i++) {
 
 const facebookIconPosArray = [[-5, -1, 0], [-5, 0, 0], [-5, 1, 0], [-4, -1, 0], [-4, 0, 0], [-4, 1, 0], [-3, -8, 0], [-3, -7, 0], [-3, -6, 0], [-3, -5, 0], [-3, -4, 0], [-3, -3, 0], [-3, -2, 0], [-3, -1, 0], [-3, 0, 0], [-3, 1, 0], [-3, 2, 0], [-3, 3, 0], [-3, 4, 0], [-2, -8, 0], [-2, -7, 0], [-2, -6, 0], [-2, -5, 0], [-2, -4, 0], [-2, -3, 0], [-2, -2, 0], [-2, -1, 0], [-2, 0, 0], [-2, 1, 0], [-2, 2, 0], [-2, 3, 0], [-2, 4, 0], [-2, 5, 0], [-2, 6, 0], [-1, -8, 0], [-1, -7, 0], [-1, -6, 0], [-1, -5, 0], [-1, -4, 0], [-1, -3, 0], [-1, -2, 0], [-1, -1, 0], [-1, 0, 0], [-1, 1, 0], [-1, 2, 0], [-1, 3, 0], [-1, 4, 0], [-1, 5, 0], [-1, 6, 0], [-1, 7, 0], [0, -8, 0], [0, -7, 0], [0, -6, 0], [0, -5, 0], [0, -4, 0], [0, -3, 0], [0, -2, 0], [0, -1, 0], [0, 0, 0], [0, 1, 0], [0, 2, 0], [0, 3, 0], [0, 4, 0], [0, 5, 0], [0, 6, 0], [0, 7, 0], [1, -1, 0], [1, 0, 0], [1, 1, 0], [1, 5, 0], [1, 6, 0], [1, 7, 0], [2, -1, 0], [2, 0, 0], [2, 1, 0], [2, 5, 0], [2, 6, 0], [2, 7, 0], [3, -1, 0], [3, 0, 0], [3, 1, 0], [3, 5, 0], [3, 6, 0], [3, 7, 0]];
 const facebookIconPosMultiplier = 0.08;
-const facebookIconPosOffset = [0, -0.9, 0];
+const facebookIconPosOffset = [0, -1.1, 0];
 const facebookIconScale = [1.6,1.6,1.6];
 for (let i = 0; i < facebookIconPosArray.length; i++) {
     for (let j = 0; j < 3; j++) {
@@ -158,7 +169,7 @@ for (let i = 0; i < facebookIconPosArray.length; i++) {
 
 const twitterIconPosArray = [[-8, 4, 0], [-7, -5, 0], [-7, 0, 0], [-7, 1, 0], [-7, 2, 0], [-7, 3, 0], [-7, 4, 0], [-7, 5, 0], [-6, -6, 0], [-6, -5, 0], [-6, -2, 0], [-6, -1, 0], [-6, 0, 0], [-6, 1, 0], [-6, 2, 0], [-6, 3, 0], [-6, 4, 0], [-5, -6, 0], [-5, -5, 0], [-5, -3, 0], [-5, -2, 0], [-5, -1, 0], [-5, 0, 0], [-5, 1, 0], [-5, 2, 0], [-5, 3, 0], [-5, 4, 0], [-4, -6, 0], [-4, -5, 0], [-4, -4, 0], [-4, -3, 0], [-4, -2, 0], [-4, -1, 0], [-4, 0, 0], [-4, 1, 0], [-4, 2, 0], [-4, 3, 0], [-3, -6, 0], [-3, -5, 0], [-3, -4, 0], [-3, -3, 0], [-3, -2, 0], [-3, -1, 0], [-3, 0, 0], [-3, 1, 0], [-3, 2, 0], [-3, 3, 0], [-2, -6, 0], [-2, -5, 0], [-2, -4, 0], [-2, -3, 0], [-2, -2, 0], [-2, -1, 0], [-2, 0, 0], [-2, 1, 0], [-2, 2, 0], [-1, -6, 0], [-1, -5, 0], [-1, -4, 0], [-1, -3, 0], [-1, -2, 0], [-1, -1, 0], [-1, 0, 0], [-1, 1, 0], [-1, 2, 0], [0, -6, 0], [0, -5, 0], [0, -4, 0], [0, -3, 0], [0, -2, 0], [0, -1, 0], [0, 0, 0], [0, 1, 0], [0, 2, 0], [0, 3, 0], [0, 4, 0], [0, 5, 0], [1, -5, 0], [1, -4, 0], [1, -3, 0], [1, -2, 0], [1, -1, 0], [1, 0, 0], [1, 1, 0], [1, 2, 0], [1, 3, 0], [1, 4, 0], [1, 5, 0], [1, 6, 0], [2, -5, 0], [2, -4, 0], [2, -3, 0], [2, -2, 0], [2, -1, 0], [2, 0, 0], [2, 1, 0], [2, 2, 0], [2, 3, 0], [2, 4, 0], [2, 5, 0], [2, 6, 0], [3, -4, 0], [3, -3, 0], [3, -2, 0], [3, -1, 0], [3, 0, 0], [3, 1, 0], [3, 2, 0], [3, 3, 0], [3, 4, 0], [3, 5, 0], [3, 6, 0], [4, -3, 0], [4, -2, 0], [4, -1, 0], [4, 0, 0], [4, 1, 0], [4, 2, 0], [4, 3, 0], [4, 4, 0], [4, 5, 0], [4, 6, 0], [5, -1, 0], [5, 0, 0], [5, 1, 0], [5, 2, 0], [5, 3, 0], [5, 4, 0], [5, 5, 0], [6, 2, 0], [6, 3, 0], [6, 4, 0], [6, 5, 0], [7, 5, 0]];
 const twitterIconPosMultiplier = 0.08;
-const twitterIconPosOffset = [0, -2.5, 0];
+const twitterIconPosOffset = [0, -2.7, 0];
 const twitterIconScale = [1.6 , 1.6, 1.6];
 for (let i = 0; i < twitterIconPosArray.length; i++) {
     for (let j = 0; j < 3; j++) {
@@ -174,10 +185,22 @@ let lastRaycastedObj, lastRaycastedGroup;
 
 const body = $("#body");
 
+let linkToOpen = "";
+
+let topArrow, bottomArrow;
+
 $(function(){
 
     innerBar = $(".innerBar");
     outerBar = $(".outerBar");
+    topArrow = $(".topArrow");
+    topArrow.on("click", function() {
+        scrollListUp();
+    });
+    bottomArrow = $(".bottomArrow");
+    bottomArrow.on("click", function() {
+        scrollListDown();
+    });
 
     grained("#grain", {
         animate: true,
@@ -255,14 +278,14 @@ $(function(){
                 if (intersects.length > 0) {
                     if (lastRaycastedGroup !== intersects[0].object.parent) {
                         if (!(intersects[0].object.parent.userData.tween == null))
-                            intersects[0].object.parent.userData.tween.stop();
+                            TWEEN.remove(intersects[0].object.parent.userData.tween);
                         intersects[0].object.parent.userData.tween = new TWEEN.Tween(intersects[0].object.parent.children[0].material.color)
                             .to({r: 1, g: 0, b: 0}, 500)
                             .start(); // Start the tween immediately.
 
                         if (!(lastRaycastedGroup == null)) {
                             if (!(lastRaycastedGroup.userData.tween == null))
-                                lastRaycastedGroup.userData.tween.stop();
+                                TWEEN.remove(lastRaycastedGroup.userData.tween);
                             lastRaycastedGroup.userData.tween = new TWEEN.Tween(lastRaycastedGroup.children[0].material.color)
                                 .to({r: 1, g: 1, b: 1}, 300)
                                 .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
@@ -270,6 +293,7 @@ $(function(){
                         }
 
                         body.addClass("pointer");
+                        linkToOpen = intersects[0].object.parent.children[0].userData.URL;
                     } else {
 
                     }
@@ -278,7 +302,7 @@ $(function(){
                 } else {
                     if (!(lastRaycastedGroup == null)) {
                         if (!(lastRaycastedGroup.userData.tween == null))
-                            lastRaycastedGroup.userData.tween.stop();
+                            TWEEN.remove(lastRaycastedGroup.userData.tween);
                         lastRaycastedGroup.userData.tween = new TWEEN.Tween(lastRaycastedGroup.children[0].material.color)
                             .to({r: 1, g: 1, b: 1}, 300)
                             .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
@@ -287,6 +311,7 @@ $(function(){
                     lastRaycastedGroup = null;
 
                     body.removeClass("pointer");
+                    linkToOpen = "";
 
                 }
             }
@@ -396,7 +421,7 @@ $(function(){
                     outline = new Mesh(outline_geo, outline_mat);
                     outline.renderOrder = -1000;
                     //Scale the object up to have an outline (as discussed in previous answer)
-                    outline.scale.multiplyScalar(1.1);
+                    outline.scale.multiplyScalar(1.2);
                     //Scale the object up to have an outline (as discussed in previous answer)
                     sphereArray[index].add(outline);
 
@@ -604,51 +629,51 @@ $(function(){
                             const newPos = sphereGoToPosArray[index].clone().multiplyScalar(sphereGroupModifier.pos);
                             const newScale = sphereSizeArray[index].clone().multiplyScalar(sphereArray[index].userData.scaleMultiplier);
 
-                            sphereArray[index].position.copy(Vector3Lerp(sphereArray[index].position, newPos, delta * speedMultiplier + i * 0.001));
-                            sphereArray[index].scale.copy(Vector3Lerp(sphereArray[index].scale, newScale, delta * speedMultiplier + i * 0.001));
-                            sphereArray[index].rotation.setFromVector3(Vector3Lerp(sphereArray[index].rotation.toVector3(), sphereRotArray[index], delta * speedMultiplier + i * 0.001), "YXZ");
-                            sphereArray[index].material.color.copy(ColorLerp(sphereArray[index].material.color, sphereGoToColorArray[index], delta));
+                            sphereArray[index].position.lerp(newPos, delta * speedMultiplier + i * 0.001);
+                            sphereArray[index].scale.lerp(newScale, delta * speedMultiplier + i * 0.001);
+                            sphereArray[index].rotation.setFromVector3(sphereArray[index].rotation.toVector3().lerp(sphereRotArray[index], delta * speedMultiplier + i * 0.001), "YXZ");
+                            sphereArray[index].material.color.lerp(sphereGoToColorArray[index], delta);
                         } else if (currentWindowState === WindowStates.WORKS) {
 
                         } else if (currentWindowState === WindowStates.CONTACT) {
                             if (index < 250) {
                                 if (index < githubIconPosArray.length) {
-                                    githubIconGroup.children[index].position.copy(Vector3LerpArray(githubIconGroup.children[index].position, githubIconPosArray[index], delta * speedMultiplier + i * 0.001));
-                                    githubIconGroup.children[index].rotation.setFromVector3(Vector3LerpArray(githubIconGroup.children[index].rotation.toVector3(), [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
-                                    githubIconGroup.children[index].scale.copy(Vector3LerpArray(githubIconGroup.children[index].scale, githubIconScale, delta * speedMultiplier + i * 0.001));
+                                    githubIconGroup.children[index].position.lerpArray(githubIconPosArray[index], delta * speedMultiplier + i * 0.001);
+                                    githubIconGroup.children[index].rotation.setFromVector3(githubIconGroup.children[index].rotation.toVector3().lerpArray( [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
+                                    githubIconGroup.children[index].scale.lerpArray(githubIconScale, delta * speedMultiplier + i * 0.001);
                                 } else {
-                                    githubIconGroup.children[index].position.copy(Vector3LerpArray(githubIconGroup.children[index].position, githubIconPosOffset, delta * speedMultiplier + i * 0.001));
-                                    githubIconGroup.children[index].scale.copy(Vector3LerpArray(githubIconGroup.children[index].scale, [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001));
+                                    githubIconGroup.children[index].position.lerpArray(githubIconPosOffset, delta * speedMultiplier + i * 0.001);
+                                    githubIconGroup.children[index].scale.lerpArray( [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001);
                                 }
                             } else if (index < 500) {
                                 index = index - 250;
                                 if (index < linkedinIconPosArray.length) {
-                                    linkedinIconGroup.children[index].position.copy(Vector3LerpArray(linkedinIconGroup.children[index].position, linkedinIconPosArray[index], delta * speedMultiplier + i * 0.001));
-                                    linkedinIconGroup.children[index].rotation.setFromVector3(Vector3LerpArray(linkedinIconGroup.children[index].rotation.toVector3(), [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
-                                    linkedinIconGroup.children[index].scale.copy(Vector3LerpArray(linkedinIconGroup.children[index].scale, linkedinIconScale, delta * speedMultiplier + i * 0.001));
+                                    linkedinIconGroup.children[index].position.lerpArray(linkedinIconPosArray[index], delta * speedMultiplier + i * 0.001);
+                                    linkedinIconGroup.children[index].rotation.setFromVector3(linkedinIconGroup.children[index].rotation.toVector3().lerpArray([0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
+                                    linkedinIconGroup.children[index].scale.lerpArray( linkedinIconScale, delta * speedMultiplier + i * 0.001);
                                 } else {
-                                    linkedinIconGroup.children[index].position.copy(Vector3LerpArray(linkedinIconGroup.children[index].position, linkedinIconPosOffset, delta * speedMultiplier + i * 0.001));
-                                    linkedinIconGroup.children[index].scale.copy(Vector3LerpArray(linkedinIconGroup.children[index].scale, [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001));
+                                    linkedinIconGroup.children[index].position.lerpArray(linkedinIconPosOffset, delta * speedMultiplier + i * 0.001);
+                                    linkedinIconGroup.children[index].scale.lerpArray([0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001);
                                 }
                             } else if (index < 750) {
                                 index = index - 500;
                                 if (index < facebookIconPosArray.length) {
-                                    facebookIconGroup.children[index].position.copy(Vector3LerpArray(facebookIconGroup.children[index].position, facebookIconPosArray[index], delta * speedMultiplier + i * 0.001));
-                                    facebookIconGroup.children[index].rotation.setFromVector3(Vector3LerpArray(facebookIconGroup.children[index].rotation.toVector3(), [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
-                                    facebookIconGroup.children[index].scale.copy(Vector3LerpArray(facebookIconGroup.children[index].scale, facebookIconScale, delta * speedMultiplier + i * 0.001));
+                                    facebookIconGroup.children[index].position.lerpArray( facebookIconPosArray[index], delta * speedMultiplier + i * 0.001);
+                                    facebookIconGroup.children[index].rotation.setFromVector3(facebookIconGroup.children[index].rotation.toVector3().lerpArray([0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
+                                    facebookIconGroup.children[index].scale.lerpArray( facebookIconScale, delta * speedMultiplier + i * 0.001);
                                 } else {
-                                    facebookIconGroup.children[index].position.copy(Vector3LerpArray(facebookIconGroup.children[index].position, facebookIconPosOffset, delta * speedMultiplier + i * 0.001));
-                                    facebookIconGroup.children[index].scale.copy(Vector3LerpArray(facebookIconGroup.children[index].scale, [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001));
+                                    facebookIconGroup.children[index].position.lerpArray(facebookIconPosOffset, delta * speedMultiplier + i * 0.001);
+                                    facebookIconGroup.children[index].scale.lerpArray([0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001);
                                 }
                             } else {
                                 index = index - 750;
                                 if (index < twitterIconPosArray.length) {
-                                    twitterIconGroup.children[index].position.copy(Vector3LerpArray(twitterIconGroup.children[index].position, twitterIconPosArray[index], delta * speedMultiplier + i * 0.001));
-                                    twitterIconGroup.children[index].rotation.setFromVector3(Vector3LerpArray(twitterIconGroup.children[index].rotation.toVector3(), [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
-                                    twitterIconGroup.children[index].scale.copy(Vector3LerpArray(twitterIconGroup.children[index].scale, twitterIconScale, delta * speedMultiplier + i * 0.001));
+                                    twitterIconGroup.children[index].position.lerpArray( twitterIconPosArray[index], delta * speedMultiplier + i * 0.001);
+                                    twitterIconGroup.children[index].rotation.setFromVector3(twitterIconGroup.children[index].rotation.toVector3().lerpArray( [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
+                                    twitterIconGroup.children[index].scale.lerpArray(twitterIconScale, delta * speedMultiplier + i * 0.001);
                                 } else {
-                                    twitterIconGroup.children[index].position.copy(Vector3LerpArray(twitterIconGroup.children[index].position, twitterIconPosOffset, delta * speedMultiplier + i * 0.001));
-                                    twitterIconGroup.children[index].scale.copy(Vector3LerpArray(twitterIconGroup.children[index].scale, [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001));
+                                    twitterIconGroup.children[index].position.lerpArray( twitterIconPosOffset, delta * speedMultiplier + i * 0.001);
+                                    twitterIconGroup.children[index].scale.lerpArray([0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001);
                                 }
 
                             }
@@ -663,22 +688,22 @@ $(function(){
             } else if (currentWindowState === WindowStates.WORKS) {
 
             } else if (currentWindowState === WindowStates.CONTACT) {
-                sphereGroup.rotation.setFromVector3(Vector3LerpArray(sphereGroup.rotation.toVector3(), [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
-                githubIconGroup.rotation.setFromVector3(Vector3LerpArray(githubIconGroup.rotation.toVector3(), [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
-                linkedinIconGroup.rotation.setFromVector3(Vector3LerpArray(linkedinIconGroup.rotation.toVector3(), [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
-                facebookIconGroup.rotation.setFromVector3(Vector3LerpArray(facebookIconGroup.rotation.toVector3(), [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
-                twitterIconGroup.rotation.setFromVector3(Vector3LerpArray(twitterIconGroup.rotation.toVector3(), [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
+                sphereGroup.rotation.setFromVector3(sphereGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
+                githubIconGroup.rotation.setFromVector3(githubIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
+                linkedinIconGroup.rotation.setFromVector3(linkedinIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
+                facebookIconGroup.rotation.setFromVector3(facebookIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
+                twitterIconGroup.rotation.setFromVector3(twitterIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
             }
 
-            var newCamPos = Vector3Lerp(camera.position, nextCamPos, delta * 2);
+            var newCamPos = new Vector3().lerpVectors(camera.position, nextCamPos, delta * 2);
             camera.position.set(newCamPos.x, newCamPos.y, camera.position.z);
             camera.lookAt(Vector3zero);
 
-            var newCam2Pos = Vector3Lerp(camera2.position, nextCam2Pos, delta * 2);
+            var newCam2Pos = new Vector3().lerpVectors(camera2.position, nextCam2Pos, delta * 2);
             camera2.position.set(newCam2Pos.x, newCam2Pos.y, camera2.position.z);
 
             for (let i = 0; i < css3dObjArray.length; i++) {
-                css3dObjArray[i].rotation.setFromVector3(Vector3Lerp(css3dObjArray[i].rotation.toVector3(), css3dObjNextRot, delta * 3));
+                css3dObjArray[i].rotation.setFromVector3(css3dObjArray[i].rotation.toVector3().lerp( css3dObjNextRot, delta * 3));
             }
         }
 
@@ -692,7 +717,7 @@ $(function(){
             angle: Math.PI * 0.55
         });
 
-        const effectPass = new EffectPass(camera , smaaEffect , dotScreenEffect  );
+        const effectPass = new EffectPass(camera , dotScreenEffect ,smaaEffect );
         effectPass.renderToScreen = true;
 
         composer.addPass(new RenderPass(scene, camera));
@@ -826,34 +851,6 @@ $(function(){
         }
     }
 
-    function getTween(b, e, i) {
-        return b + (Math.min(i, 1) * (e-b));
-    }
-
-    function Vector3Lerp(b, e, i) {
-        const newVector3 = new Vector3();
-        newVector3.x = getTween(b.x, e.x, i);
-        newVector3.y = getTween(b.y, e.y, i);
-        newVector3.z = getTween(b.z, e.z, i);
-        return newVector3;
-    }
-
-    function Vector3LerpArray(b, e, i) {
-        const newVector3 = new Vector3(e[0], e[1], e[2]);
-        newVector3.x = getTween(b.x, newVector3.x, i);
-        newVector3.y = getTween(b.y, newVector3.y, i);
-        newVector3.z = getTween(b.z, newVector3.z, i);
-        return newVector3;
-    }
-
-    function ColorLerp(b, e, i) {
-        const newColor = new Color();
-        newColor.r = getTween(b.r, e.r, i);
-        newColor.g = getTween(b.b, e.b, i);
-        newColor.b = getTween(b.g, e.g, i);
-        return newColor;
-    }
-
     const isArray = Array.isArray || function(value) {
         return {}.toString.call(value) !== "[object Array]"
     };
@@ -937,21 +934,32 @@ $(function(){
 
     function scrollListDown() {
         if (!isListBeingScrolled && curCss3dObjIndex < css3dObjArray.length - 1) {
+
             isListBeingScrolled = true;
+            topArrow.removeClass("dimmed");
 
             innerBar.css("top", (100 * (curCss3dObjIndex + 1 ) / totalWorksCount) + "%");
 
-            new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+            if (css3dObjArray[curCss3dObjIndex].userData.tween) {
+                TWEEN.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
+            }
+            css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
                 .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
                 .easing(TWEEN.Easing.Cubic.Out)
                 .start();
 
-            new TWEEN.Tween(css3dObjArray[curCss3dObjIndex + 1].scale)
+            if (css3dObjArray[curCss3dObjIndex + 1].userData.tween) {
+                TWEEN.remove(css3dObjArray[curCss3dObjIndex + 1].userData.tween);
+            }
+            css3dObjArray[curCss3dObjIndex + 1].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex + 1].scale)
                 .to({x: 1, y: 1, z: 1}, 800)
                 .easing(TWEEN.Easing.Back.Out)
                 .start();
 
-            new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
+            if (css3dObjGroup.userData.tween) {
+                TWEEN.remove(css3dObjGroup.userData.tween);
+            }
+            css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
                 .to({ y: 1000 * (curCss3dObjIndex + 1) }, 800) // Move to (300, 200) in 1 second.
                 .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
                 // .onComplete(function() {
@@ -965,25 +973,40 @@ $(function(){
 
             curCss3dObjIndex += 1;
         }
+
+        if (curCss3dObjIndex === css3dObjArray.length - 1) {
+            bottomArrow.addClass("dimmed");
+        }
     }
 
     function scrollListUp() {
         if (!isListBeingScrolled && curCss3dObjIndex > 0) {
+            bottomArrow.removeClass("dimmed");
 
             innerBar.css("top", (100 * (curCss3dObjIndex - 1 ) / totalWorksCount) + "%");
 
             isListBeingScrolled = true;
-            new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+
+            if (css3dObjArray[curCss3dObjIndex].userData.tween) {
+                TWEEN.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
+            }
+            css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
                 .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
                 .easing(TWEEN.Easing.Cubic.Out)
                 .start();
 
-            new TWEEN.Tween(css3dObjArray[curCss3dObjIndex - 1].scale)
+            if (css3dObjArray[curCss3dObjIndex - 1].userData.tween) {
+                TWEEN.remove(css3dObjArray[curCss3dObjIndex - 1].userData.tween);
+            }
+            css3dObjArray[curCss3dObjIndex - 1].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex - 1].scale)
                 .to({x: 1, y: 1, z: 1}, 800)
                 .easing(TWEEN.Easing.Quadratic.InOut)
                 .start();
 
-            new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
+            if (css3dObjGroup.userData.tween) {
+                TWEEN.remove(css3dObjGroup.userData.tween);
+            }
+            css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
                 .to({ y: 1000 * (curCss3dObjIndex - 1) }, 800) // Move to (300, 200) in 1 second.
                 .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
                 // .onComplete(function() {
@@ -996,6 +1019,10 @@ $(function(){
             }, 300);
 
             curCss3dObjIndex -= 1;
+        }
+
+        if (curCss3dObjIndex === 0) {
+            topArrow.addClass("dimmed");
         }
     }
 
@@ -1011,8 +1038,8 @@ $(function(){
         }
 
 
-        css3dObjNextRot.x = -mouse.y * 0.1;
-        css3dObjNextRot.y = mouse.x * 0.3;
+        css3dObjNextRot.x = Math.max(Math.min(-mouse.y * 0.1 * 0.5, 1), -1);
+        css3dObjNextRot.y = Math.max(Math.min(mouse.x * 0.3 * 0.5, 1), -1);
     }
 
     function onTouchMove(event) {
@@ -1055,9 +1082,7 @@ $(function(){
             } else if (currentWindowState === WindowStates.WORKS) {
 
             } else {
-                if (!(lastRaycastedGroup == null)) {
-                    window.open(lastRaycastedGroup.children[0].userData.URL, "_blank");
-                }
+
             }
 
             // var objToTween = {z: camera.position.z, fov: camera.fov};
@@ -1071,7 +1096,11 @@ $(function(){
             //     })
             //     .start(); // Start the tween immediately.
 
-            new TWEEN.Tween(sphereGroupModifier)
+            if (sphereGroupModifierTween) {
+                TWEEN.remove(sphereGroupModifierTween);
+            }
+
+            sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
                 .to({pos: 1.5}, 100)
                 .easing(TWEEN.Easing.Cubic.Out)
                 .start();
@@ -1094,6 +1123,7 @@ $(function(){
         // console.log(event.pageX - clickMousePos.x);
         // console.log(event.pageY - clickMousePos.y);
         const mousePos = pointerEventToXY(event);
+        MouseRaycast();
         let yDiff = mousePos.y - clickMousePos.y;
         if (currentWindowState === WindowStates.WORKS && event.type === "touchend") {
             if (yDiff < 0)
@@ -1110,6 +1140,16 @@ $(function(){
                 triggerRandomAnimationTimeout = setTimeout(function() {
                     ToggleRandomAnimation();
                 }, 5000);
+            } else if (currentWindowState === WindowStates.WORKS) {
+
+            } else {
+                if (!(lastRaycastedGroup == null) && linkToOpen !== "") {
+                    new TWEEN.Tween(lastRaycastedGroup.children[0].material.color)
+                        .to({r: 1, g: 1, b: 1}, 300)
+                        .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
+                        .start(); // Start the tween immediately.
+                    window.open(linkToOpen, "_blank");
+                }
             }
 
 
@@ -1130,7 +1170,11 @@ $(function(){
             //     })
             //     .start(); // Start the tween immediately.
 
-            new TWEEN.Tween(sphereGroupModifier)
+            if (sphereGroupModifierTween) {
+                TWEEN.remove(sphereGroupModifierTween);
+            }
+
+            sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
                 .to({pos: 1}, 100)
                 .easing(TWEEN.Easing.Cubic.Out)
                 .start();
@@ -1197,9 +1241,9 @@ $(function(){
 
         clearTimeout(triggerRandomAnimationTimeout);
 
-        speedMultiplier = 3;
+        nextCamPos.y = 0;
 
-        let children = sphereGroup.children;
+        speedMultiplier = 3;
 
         githubIconGroup.rotation.copy(sphereGroup.rotation);
         githubIconGroup.position.copy(sphereGroup.position);
@@ -1285,3 +1329,7 @@ $(function(){
     }
 
 });
+
+function getTween(b, e, i) {
+    return b + (Math.min(i, 1) * (e-b));
+}

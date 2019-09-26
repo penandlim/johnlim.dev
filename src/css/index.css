@@ -277,7 +277,9 @@ iframe {
     transition: opacity 0.5s;
     -webkit-transition: opacity 0.5s;
     right: 5vw;
-    top: 15vh;
+    top: 17vh;
+    border-radius: 0.5vh;
+    box-shadow: 0px 0px 0px 1px #000 inset;
 }
 
 @media (min-width: 1200px) {
@@ -294,6 +296,7 @@ iframe {
     top : 0;
     transition: top 0.5s;
     -webkit-transition: top 0.5s;
+    border-radius: 0.5vh;
 }
 
 .videoPreview {
@@ -310,5 +313,31 @@ iframe {
 }
 
 .pointer {
+    cursor: pointer;
+}
+
+.topArrow {
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+    top: -6%;
+    font-size: 2vh;
+    transition: opacity 0.5s ease-in;
+    cursor: pointer;
+}
+
+.dimmed {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: default !important;
+}
+
+.bottomArrow {
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+    top: 100%;
+    font-size: 2vh;
+    transition: opacity 0.5s ease-in;
     cursor: pointer;
 }

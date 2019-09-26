@@ -12,7 +12,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist')
     },
     devServer: {
-        contentBase: 'dist/', //disk location
+        contentBase: 'src/', //disk location
         watchContentBase: true
     },
     module: {
