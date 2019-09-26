@@ -44,7 +44,7 @@
       "title":"IconStory Online",
       "previewType":"youtube",
       "previewSrc":"https://www.youtube.com/embed/nnN_OijYp08",
-      "descriptionText":"Community online journal website built on ICON Blockchain Network.",
+      "descriptionText":"Decentralized application for ICON Blockchain Network. Contribute to the shared journal using ICX. Finished posts are shared on Twitter by @IconstoryOnline",
       "keywords":[
         {
           "type":"frontend",
@@ -68,7 +68,11 @@
         },
         {
           "type":"other",
-          "keyword":"Blockchain"
+          "keyword":"Python"
+        },
+        {
+          "type":"other",
+          "keyword":"ICX Blockchain"
         },
         {
           "type":"other",
@@ -76,14 +80,15 @@
         }
       ],
       "links":{
-        "direct":"https://iconstory.online"
+        "direct":"https://iconstory.online",
+        "github": "https://github.com/penandlim/IconStory"
       }
     },
     {
       "title":"EtherWords.io",
       "previewType":"youtube",
       "previewSrc":"https://www.youtube.com/embed/nnN_OijYp08",
-      "descriptionText":"Ethereum DApp inspired by CryptoKitties. Buy and sell words on the website with Ethereum",
+      "descriptionText":"Decentralized application for buying and selling words with Ethereum. Inspired by CryptoKitties.",
       "keywords":[
         {
           "type":"frontend",
@@ -103,20 +108,24 @@
         },
         {
           "type":"backend",
-          "keyword":"Ethereum Smart Contract"
+          "keyword":"ERC721"
         },
         {
           "type":"other",
-          "keyword":"Blockchain"
+          "keyword":"MetaMask"
         },
         {
           "type":"other",
-          "keyword":"Solidarity"
+          "keyword":"Ethereum"
+        },
+        {
+          "type":"other",
+          "keyword":"Solidity"
         }
       ],
       "links":{
         "direct":"https://etherwords.io",
-        "github":"https://github.com"
+        "github":"https://github.com/penandlim/EtherWords"
       }
     }
 

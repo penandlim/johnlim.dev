@@ -193,6 +193,8 @@ let topArrow, bottomArrow;
 
 let AnimToComplexCubeFn;
 
+let css3dObjGroupOffset = -10;
+
 $(function(){
 
     innerBar = $(".innerBar");
@@ -347,6 +349,8 @@ $(function(){
         });
 
         scene2.add(css3dObjGroup);
+
+        css3dObjGroup.position.y = css3dObjGroupOffset;
 
         // scrollBar = new CSS3DObject(outerBar[0]);
         // scrollBar.position.x = 240;
@@ -977,7 +981,7 @@ $(function(){
                 TWEEN.remove(css3dObjGroup.userData.tween);
             }
             css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
-                .to({ y: 1000 * (curCss3dObjIndex + 1) }, 800) // Move to (300, 200) in 1 second.
+                .to({ y: 1000 * (curCss3dObjIndex + 1) + css3dObjGroupOffset }, 800) // Move to (300, 200) in 1 second.
                 .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
                 // .onComplete(function() {
                 //     isListBeingScrolled = false;
@@ -1024,7 +1028,7 @@ $(function(){
                 TWEEN.remove(css3dObjGroup.userData.tween);
             }
             css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
-                .to({ y: 1000 * (curCss3dObjIndex - 1) }, 800) // Move to (300, 200) in 1 second.
+                .to({ y: 1000 * (curCss3dObjIndex - 1) + css3dObjGroupOffset }, 800) // Move to (300, 200) in 1 second.
                 .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
                 // .onComplete(function() {
                 //     isListBeingScrolled = false;
