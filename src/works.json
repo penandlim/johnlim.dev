@@ -44,7 +44,7 @@
       "title":"OnlyHearts",
       "previewType":"video",
       "previewSrc":"videos/onlyhearts.mp4",
-      "descriptionText":"(In Development) An anime-inspired roguelike card game made in Unity3D.",
+      "descriptionText":"(In Development) An anime-inspired roguelike card game made in Unity3D. ",
       "keywords":[
         {
           "type":"other",
@@ -61,6 +61,10 @@
         {
           "type":"other",
           "keyword":"LWRP (URP)"
+        },
+        {
+          "type":"other",
+          "keyword":"Final IK"
         },
         {
           "type":"other",
