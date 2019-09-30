@@ -696,12 +696,12 @@ $(function(){
                 twitterIconGroup.rotation.setFromVector3(twitterIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
             }
 
-            let newCamPos = new Vector3().lerpVectors(camera.position, nextCamPos, delta * 2);
-            camera.position.set(newCamPos.x, newCamPos.y, camera.position.z);
+
+            camera.position.lerp(nextCamPos, delta * 2);
             camera.lookAt(Vector3zero);
 
-            let newCam2Pos = new Vector3().lerpVectors(camera2.position, nextCam2Pos, delta * 2);
-            camera2.position.set(newCam2Pos.x, newCam2Pos.y, camera2.position.z);
+            // let newCam2Pos = new Vector3().lerpVectors(camera2.position, nextCam2Pos, delta * 2);
+            // camera2.position.set(newCam2Pos.x, newCam2Pos.y, camera2.position.z);
 
             for (let i = 0; i < css3dObjArray.length; i++) {
                 css3dObjArray[i].rotation.setFromVector3(css3dObjArray[i].rotation.toVector3().lerp( css3dObjNextRot, delta * 3));
@@ -1029,9 +1029,9 @@ $(function(){
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         // console.log(mouse.x + ", " + mouse.y);
         if (currentWindowState === WindowStates.HOME) {
-            nextCamPos.y = mouse.y;
+            nextCamPos.y = mouse.y + 0.3;
         } else {
-            nextCamPos.y = 0;
+            nextCamPos.y = 0.3;
         }
 
 
@@ -1044,8 +1044,8 @@ $(function(){
         mouse.x = (event.touches[0].pageX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.touches[0].pageY / window.innerHeight) * 2 + 1;
         // console.log(mouse.x + ", " + mouse.y);
-        css3dObjNextRot.x = -mouse.y * 0.1;
-        css3dObjNextRot.y = mouse.x * 0.3;
+        css3dObjNextRot.x = Math.max(Math.min(-mouse.y * 0.1 * 0.5, 1), -1);
+        css3dObjNextRot.y = Math.max(Math.min(mouse.x * 0.3 * 0.5, 1), -1);
     }
 
     function onMouseDown(event) {
@@ -1255,6 +1255,9 @@ $(function(){
     }
 
     function TransitionFromContact() {
+
+        nextCamPos.y = 0.3;
+
         if (!(lastRaycastedGroup == null)) {
             new TWEEN.Tween(lastRaycastedGroup.children[0].material.color)
                 .to({r: 1, g: 1, b: 1}, 300)
@@ -1313,6 +1316,11 @@ $(function(){
 
         if (currentAnimationIndex !== 2) {
             AnimToComplexTrigger = true;
+        } else {
+            triggerRandomAnimationTimeout = setTimeout(function() {
+                ToggleRandomAnimation();
+                // AnimToRingTrigger = true;
+            }, 5000);
         }
 
 
