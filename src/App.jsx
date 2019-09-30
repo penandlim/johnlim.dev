@@ -34,6 +34,15 @@ class PreviewVideo extends React.Component {
     }
 }
 
+class PreviewImg extends React.Component {
+    render() {
+        return (
+            <img className="videoPreview" src={this.props.previewSrc} alt="Preview Image">
+            </img>
+        );
+    }
+}
+
 class Preview extends React.Component {
 // Use the render function to return JSX component
     render() {
@@ -42,6 +51,8 @@ class Preview extends React.Component {
             previewContent = <PreviewYoutube previewSrc={this.props.previewSrc} />;
         } else if (this.props.type === "video") {
             previewContent = <PreviewVideo previewSrc={this.props.previewSrc} />
+        } else if (this.props.type === "img") {
+            previewContent = <PreviewImg previewSrc={this.props.previewSrc} />
         }
 
         return (
@@ -90,11 +101,15 @@ class Links extends React.Component {
     render() {
 
         var links = [];
-        if (!(this.props.links.direct == null)) {
-            links.push(<Link key={this.props.links.direct} url={this.props.links.direct} fa="fas fa-external-link-alt" />);
+        if (this.props.links.direct) {
+            this.props.links.direct.forEach(function(e) {
+                links.push(<Link key={e} url={e} fa="fas fa-external-link-alt" />);
+            });
         }
-        if (!(this.props.links.github == null)) {
-            links.push(<Link key={this.props.links.github} url={this.props.links.github} fa="fab fa-github" />);
+        if (this.props.links.github) {
+            this.props.links.github.forEach(function(e) {
+                links.push(<Link key={e} url={e} fa="fab fa-github" />);
+            });
         }
 
         return(

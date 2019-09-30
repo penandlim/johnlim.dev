@@ -912,7 +912,7 @@ $(function(){
 
     });
 
-    $(window).on('wheel', function(event) {
+    $(document).on('wheel', { passive: true } , function(event) {
         return scrollEventHandler(event);
     });
 
@@ -1332,7 +1332,7 @@ $(function(){
         css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
             .to({x: 1, y: 1, z: 1}, 800)
             .easing(TWEEN.Easing.Cubic.Out)
-            .delay(300)
+            .delay(500)
             .start();
     }
 

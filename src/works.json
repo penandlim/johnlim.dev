@@ -36,8 +36,8 @@
         }
       ],
       "links":{
-        "direct":"https://johnlim.dev",
-        "github":"https://github.com/penandlim"
+        "direct":["https://johnlim.dev"],
+        "github":["https://github.com/penandlim"]
       }
     },
     {
@@ -114,14 +114,14 @@
         }
       ],
       "links":{
-        "direct":"https://iconstory.online",
-        "github": "https://github.com/penandlim/IconStory"
+        "direct": ["https://iconstory.online"],
+        "github": ["https://github.com/penandlim/IconStory"]
       }
     },
     {
       "title":"EtherWords.io",
-      "previewType":"youtube",
-      "previewSrc":"https://www.youtube.com/embed/nnN_OijYp08",
+      "previewType":"img",
+      "previewSrc":"img/EtherwordsPreview.jpg",
       "descriptionText":"Decentralized application for buying and selling words with Ethereum. Inspired by CryptoKitties.",
       "keywords":[
         {
@@ -158,8 +158,8 @@
         }
       ],
       "links":{
-        "direct":"https://etherwords.io",
-        "github":"https://github.com/penandlim/EtherWords"
+        "direct":["https://etherwords.io"],
+        "github":["https://github.com/penandlim/EtherWords"]
       }
     }
 

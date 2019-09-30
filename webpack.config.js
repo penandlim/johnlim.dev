@@ -53,7 +53,8 @@ module.exports = {
             { from: 'src/webfonts', to: 'webfonts' },
             { from: 'src/css', to: 'css' },
             { from: 'src/works.json', to: 'works.json' },
-            {from : 'src/videos', to: 'videos'}
+            { from : 'src/videos', to: 'videos'},
+            { from : 'src/img', to: 'img'}
         ])
 
     ],
