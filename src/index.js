@@ -689,11 +689,11 @@ $(function(){
                 sphereGroup.rotateY(delta * 0.5 * rotationSpeedMultiplier.y);
 
             } else if (currentWindowState === WindowStates.CONTACT) {
-                sphereGroup.rotation.setFromVector3(sphereGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
-                githubIconGroup.rotation.setFromVector3(githubIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
-                linkedinIconGroup.rotation.setFromVector3(linkedinIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
-                facebookIconGroup.rotation.setFromVector3(facebookIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
-                twitterIconGroup.rotation.setFromVector3(twitterIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
+                sphereGroup.rotation.setFromVector3(sphereGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
+                githubIconGroup.rotation.setFromVector3(githubIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
+                linkedinIconGroup.rotation.setFromVector3(linkedinIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
+                facebookIconGroup.rotation.setFromVector3(facebookIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
+                twitterIconGroup.rotation.setFromVector3(twitterIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
             }
 
             let newCamPos = new Vector3().lerpVectors(camera.position, nextCamPos, delta * 2);
@@ -818,7 +818,7 @@ $(function(){
             //     });
             // });
 
-        }, 2000);
+        }, 100);
 
 
     }
@@ -1096,28 +1096,11 @@ $(function(){
             } else {
 
             }
-
-            // var objToTween = {z: camera.position.z, fov: camera.fov};
-            // tweenZoomAction = new TWEEN.Tween(objToTween) // Create a new tween that modifies 'coords'.
-            //     .to({ z: 5, fov: 50 }, 700) // Move to (300, 200) in 1 second.
-            //     .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
-            //     .onUpdate(() => { // Called after tween.js updates 'coords'.
-            //         camera.position.set(camera.position.x, camera.position.y, objToTween.z);
-            //         camera.fov = objToTween.fov;
-            //         camera.updateProjectionMatrix();
-            //     })
-            //     .start(); // Start the tween immediately.
-            // new TWEEN.Tween(dotScreenEffect.blendMode.opacity)
-            //     .to({value: 0.0}, 500)
-            //     .easing(TWEEN.Easing.Cubic.Out)
-            //     .start();
             speedMultiplier = 5;
         }
     }
 
     function onMouseUp(event) {
-        // console.log(event.pageX - clickMousePos.x);
-        // console.log(event.pageY - clickMousePos.y);
         const mousePos = pointerEventToXY(event);
         MouseRaycast();
         let yDiff = mousePos.y - clickMousePos.y;
@@ -1305,16 +1288,16 @@ $(function(){
 
         sphereArray[0].material.wireframe = true;
         sphereArray[0].material.color.set(0x000000);
-        sphereArray[0].material.opacity = 0.1;
+        sphereArray[0].material.opacity = 0.3;
         sphereArray[250].material.wireframe = true;
         sphereArray[250].material.color.set(0x000000);
-        sphereArray[250].material.opacity = 0.1;
+        sphereArray[250].material.opacity = 0.3;
         sphereArray[500].material.wireframe = true;
         sphereArray[500].material.color.set(0x000000);
-        sphereArray[500].material.opacity = 0.1;
+        sphereArray[500].material.opacity = 0.3;
         sphereArray[750].material.wireframe = true;
         sphereArray[750].material.color.set(0x000000);
-        sphereArray[750].material.opacity = 0.1;
+        sphereArray[750].material.opacity = 0.3;
         if ( outline.userData.tween ) {
             TWEEN.remove( outline.userData.tween );
         }
@@ -1328,7 +1311,11 @@ $(function(){
             .easing(TWEEN.Easing.Cubic.Out)
             .start();
 
-        AnimToComplexTrigger = true;
+        if (currentAnimationIndex !== 2) {
+            AnimToComplexTrigger = true;
+        }
+
+
 
         if (css3dObjArray[curCss3dObjIndex].userData.tween) {
             TWEEN.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
@@ -1337,6 +1324,7 @@ $(function(){
         css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
             .to({x: 1, y: 1, z: 1}, 800)
             .easing(TWEEN.Easing.Cubic.Out)
+            .delay(300)
             .start();
     }
 
