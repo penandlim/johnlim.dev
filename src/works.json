@@ -41,6 +41,40 @@
       }
     },
     {
+      "title":"OnlyHearts",
+      "previewType":"video",
+      "previewSrc":"videos/onlyhearts.mp4",
+      "descriptionText":"(In Development) An anime-inspired roguelike card game made in Unity3D. ",
+      "keywords":[
+        {
+          "type":"other",
+          "keyword":"Unity3D"
+        },
+        {
+          "type":"other",
+          "keyword":"Shader programming"
+        },
+        {
+          "type":"other",
+          "keyword":"Shader graph"
+        },
+        {
+          "type":"other",
+          "keyword":"LWRP (URP)"
+        },
+        {
+          "type":"other",
+          "keyword":"Final IK"
+        },
+        {
+          "type":"other",
+          "keyword":"Odin Inspector"
+        }
+      ],
+      "links":{
+      }
+    },
+    {
       "title":"IconStory Online",
       "previewType":"youtube",
       "previewSrc":"https://www.youtube.com/embed/nnN_OijYp08",
