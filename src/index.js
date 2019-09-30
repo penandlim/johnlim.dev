@@ -912,7 +912,7 @@ $(function(){
 
     });
 
-    $(document).on('wheel', { passive: true } , function(event) {
+    $(document).on('wheel', { passive: false } , function(event) {
         return scrollEventHandler(event);
     });
 

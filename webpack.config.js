@@ -54,7 +54,8 @@ module.exports = {
             { from: 'src/css', to: 'css' },
             { from: 'src/works.json', to: 'works.json' },
             { from : 'src/videos', to: 'videos'},
-            { from : 'src/img', to: 'img'}
+            { from : 'src/img', to: 'img'},
+            { from: "src/unityprojects", to: "unityprojects"}
         ])
 
     ],
