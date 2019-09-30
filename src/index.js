@@ -1107,19 +1107,11 @@ $(function(){
             //         camera.updateProjectionMatrix();
             //     })
             //     .start(); // Start the tween immediately.
-
-
-
             // new TWEEN.Tween(dotScreenEffect.blendMode.opacity)
             //     .to({value: 0.0}, 500)
             //     .easing(TWEEN.Easing.Cubic.Out)
             //     .start();
-
-
-
-
             speedMultiplier = 5;
-
         }
     }
 
