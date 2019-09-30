@@ -235,7 +235,7 @@ $(function(){
             console.error(error)
         });
 
-    var textWrapper = document.querySelector('.letters');
+    let textWrapper = document.querySelector('.letters');
     textWrapper.innerHTML = textWrapper.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
 
 
@@ -325,7 +325,6 @@ $(function(){
     }
 
     function insertThreeJSCanvas() {
-
         scene = new Scene();
         camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         camera2 = new PerspectiveCamera( 75, window.innerWidth / mainEl.outerHeight(true), 0.1, 1000 );
@@ -338,7 +337,7 @@ $(function(){
         document.body.appendChild(renderer2.domElement);
 
         //CSS Object
-        var div;
+        let div;
         $(".workContainer").each(function(index) {
             div = new CSS3DObject(this);
             div.position.x = 0;
@@ -349,7 +348,6 @@ $(function(){
         });
 
         scene2.add(css3dObjGroup);
-
         css3dObjGroup.position.y = css3dObjGroupOffset;
 
         // scrollBar = new CSS3DObject(outerBar[0]);
@@ -358,20 +356,13 @@ $(function(){
         // scrollBar.position.z = -700;
         // scene2.add(scrollBar);
 
-
-
         renderer = new WebGLRenderer( { alpha: true, antialias: false} );
         // renderer.setClearColor(0xf1f2f3, 1);
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.setPixelRatio( window.devicePixelRatio );
 
-
-
-
-
-
-        var maxCount = 10;
-        var perGap = 0.4;
+        const maxCount = 10;
+        const perGap = 0.4;
 
         outline_mat = new MeshBasicMaterial({color : 0x000000, transparent : true, opacity: 1,  side: THREE.BackSide, depthTest : false});
         outline_mat.blending = THREE.CustomBlending;
@@ -379,8 +370,8 @@ $(function(){
         outline_mat.blendSrc = THREE.SrcAlphaFactor; //default
         outline_mat.blendDst = THREE.OneMinusSrcAlphaFactor; //default
 
-        var cube_geo = new BoxGeometry(  0.05, 0.05, 0.05  );
-        var outline_geo = cube_geo.clone();
+        let cube_geo = new BoxGeometry(  0.05, 0.05, 0.05  );
+        let outline_geo = cube_geo.clone();
 
         let cube_mat1 = new MeshPhongMaterial( { color: 0xffffff, opacity : 1, transparent : true } );
         let cube_mat2 = new MeshPhongMaterial( { color: 0xffffff, opacity : 1, transparent : true } );
@@ -388,12 +379,12 @@ $(function(){
         let cube_mat4 = new MeshPhongMaterial( { color: 0xffffff, opacity : 1, transparent : true } );
 
 
-        for (var i = 0; i < maxCount; i ++) {
-            for (var j = 0; j < maxCount; j ++) {
-                for (var k = 0; k < maxCount; k ++) {
+        for (let i = 0; i < maxCount; i ++) {
+            for (let j = 0; j < maxCount; j ++) {
+                for (let k = 0; k < maxCount; k ++) {
 
 
-                    var index = i + j * maxCount + k * maxCount * maxCount;
+                    const index = i + j * maxCount + k * maxCount * maxCount;
 
                     let cube_mat;
                     let userData = {};
@@ -414,17 +405,14 @@ $(function(){
 
                     sphereArray[index] = new Mesh( cube_geo, cube_mat );
                     sphereArray[index].userData = userData;
-                    var temp = new Vector3( i * perGap - (maxCount - 1) * perGap / 2, j * perGap - (maxCount - 1) * perGap / 2, k * perGap - (maxCount - 1) * perGap / 2);
+                    let temp = new Vector3( i * perGap - (maxCount - 1) * perGap / 2, j * perGap - (maxCount - 1) * perGap / 2, k * perGap - (maxCount - 1) * perGap / 2);
                     sphereBigCubePosArray[index] = temp.clone().multiplyScalar(0.9);
                     sphereGoToPosArray[index] = temp.clone();
                     sphereSmallCubePosArray[index] = temp.clone().multiplyScalar(0.33);
                     sphereSizeArray[index] = new Vector3(2, 2, 2);
                     sphereRotArray[index] = new Vector3(0, 0, 0);
 
-
                     sphereArray[index].position.set(temp.x, temp.y, temp.z);
-
-                    //Notice the second parameter of the material
 
                     outline = new Mesh(outline_geo, outline_mat);
                     outline.renderOrder = -1000;
@@ -432,13 +420,7 @@ $(function(){
                     outline.scale.multiplyScalar(1.2);
                     //Scale the object up to have an outline (as discussed in previous answer)
                     sphereArray[index].add(outline);
-
-                    // var wireframe = new LineSegments( line_geo, line_mat );
-                    // sphereArray[index].add( wireframe );
-
                     sphereGoToColorArray[index] = cube_mat.color;
-
-
                     sphereGroup.add(sphereArray[index]);
                 }
             }
@@ -450,25 +432,19 @@ $(function(){
         scene.add( sphereGroup );
         scene.add(githubIconGroup, linkedinIconGroup, facebookIconGroup, twitterIconGroup);
         sphereGroup.scale.set(0.01, 0.01, 0.01);
-        sphereGroup.position.set(sphereGroup.position.x, sphereGroup.position.y - 0.3, sphereGroup.position.z);
+        sphereGroup.position.set(sphereGroup.position.x, sphereGroup.position.y - 0.2, sphereGroup.position.z);
 
-
-
-
-
-
-
-        var directionalLight = new DirectionalLight( 0xff7722, 1 );
+        let directionalLight = new DirectionalLight( 0xff7722, 1 );
         directionalLight.position.set(0,2,1);
 
         scene.add( directionalLight );
 
-        var directionalLight = new DirectionalLight( 0x2288ff, 1.1 );
+        directionalLight = new DirectionalLight( 0x2288ff, 1.1 );
         directionalLight.position.set(-2,-2,3);
 
         scene.add( directionalLight );
 
-        var directionalLight = new DirectionalLight( 0x00ffff, 0.5 );
+        directionalLight = new DirectionalLight( 0x00ffff, 0.5 );
         directionalLight.position.set(2,0,0);
 
         scene.add( directionalLight );
@@ -491,10 +467,10 @@ $(function(){
         function AnimToSmallCube() {
             console.log("Animating to small cube");
             shuffle(sphereSmallCubePosArray);
-            for (var i = 0; i < maxCount; i ++) {
-                for (var j = 0; j < maxCount; j++) {
-                    for (var k = 0; k < maxCount; k++) {
-                        var index = i + j * maxCount + k * maxCount * maxCount;
+            for (let i = 0; i < maxCount; i ++) {
+                for (let j = 0; j < maxCount; j++) {
+                    for (let k = 0; k < maxCount; k++) {
+                        const index = i + j * maxCount + k * maxCount * maxCount;
 
                         sphereGoToPosArray[index].copy(sphereSmallCubePosArray[index]);
                         sphereSizeArray[index].copy(new Vector3(2.7,2.7,2.7));
@@ -517,10 +493,10 @@ $(function(){
         function AnimToBigCube() {
             console.log("Animating to Big cube");
             shuffle(sphereBigCubePosArray);
-            for (var i = 0; i < maxCount; i ++) {
-                for (var j = 0; j < maxCount; j++) {
-                    for (var k = 0; k < maxCount; k++) {
-                        var index = i + j * maxCount + k * maxCount * maxCount;
+            for (let i = 0; i < maxCount; i ++) {
+                for (let j = 0; j < maxCount; j++) {
+                    for (let k = 0; k < maxCount; k++) {
+                        const index = i + j * maxCount + k * maxCount * maxCount;
 
                         sphereGoToPosArray[index].copy(sphereBigCubePosArray[index]);
                         sphereSizeArray[index].copy(Vector3two);
@@ -542,12 +518,12 @@ $(function(){
         function AnimToComplexCube(stopAnimation = false) {
             console.log("Animating to Complex cube");
             shuffle(sphereComplexRotArray, sphereComplexScaleArray, sphereComplexPosArray);
-            for (var i = 0; i < maxCount; i ++) {
-                for (var j = 0; j < maxCount; j++) {
-                    for (var k = 0; k < maxCount; k++) {
-                        var index = i + j * maxCount + k * maxCount * maxCount;
+            for (let i = 0; i < maxCount; i ++) {
+                for (let j = 0; j < maxCount; j++) {
+                    for (let k = 0; k < maxCount; k++) {
+                        const index = i + j * maxCount + k * maxCount * maxCount;
 
-                        var fixedIndex;
+                        let fixedIndex;
                         if (index > sphereComplexPosArray.length - 1) {
                             fixedIndex = index - sphereComplexPosArray.length;
                             if (fixedIndex > sphereComplexPosArray.length - 1) {
@@ -558,7 +534,7 @@ $(function(){
                             fixedIndex = index;
                         }
 
-                        var posArray = sphereComplexPosArray[fixedIndex];
+                        let posArray = sphereComplexPosArray[fixedIndex];
                         if (index > sphereComplexPosArray.length - 1) {
                             posArray = [0 ,0 ,0];
                         }
@@ -566,7 +542,7 @@ $(function(){
                         sphereGoToPosArray[index].set(posArray[0], posArray[1], posArray[2]);
                         sphereGoToPosArray[index].multiplyScalar(0.65);
 
-                        var scaleArray = sphereComplexScaleArray[fixedIndex];
+                        let scaleArray = sphereComplexScaleArray[fixedIndex];
                         if (index > sphereComplexPosArray.length - 1) {
                             scaleArray = [0.00001,0.00001 ,0.00001];
                         }
@@ -578,7 +554,7 @@ $(function(){
 
                         sphereSizeArray[index].multiplyScalar(5.65);
 
-                        var rotArray = sphereComplexRotArray[fixedIndex];
+                        let rotArray = sphereComplexRotArray[fixedIndex];
                         sphereRotArray[index].set(rotArray[0], rotArray[1], rotArray[2]);
                     }
                 }
@@ -600,12 +576,12 @@ $(function(){
         function AnimToRing() {
             console.log("Animating to ring");
             shuffle(ringPosArray);
-            for (var i = 0; i < maxCount; i ++) {
-                for (var j = 0; j < maxCount; j++) {
-                    for (var k = 0; k < maxCount; k++) {
-                        var index = i + j * maxCount + k * maxCount * maxCount;
+            for (let i = 0; i < maxCount; i ++) {
+                for (let j = 0; j < maxCount; j++) {
+                    for (let k = 0; k < maxCount; k++) {
+                        const index = i + j * maxCount + k * maxCount * maxCount;
 
-                        var fixedIndex;
+                        let fixedIndex;
                         if (index > ringPosArray.length - 1) {
                             fixedIndex = index - ringPosArray.length;
                         }
@@ -720,11 +696,11 @@ $(function(){
                 twitterIconGroup.rotation.setFromVector3(twitterIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier + i * 0.001), "YXZ");
             }
 
-            var newCamPos = new Vector3().lerpVectors(camera.position, nextCamPos, delta * 2);
+            let newCamPos = new Vector3().lerpVectors(camera.position, nextCamPos, delta * 2);
             camera.position.set(newCamPos.x, newCamPos.y, camera.position.z);
             camera.lookAt(Vector3zero);
 
-            var newCam2Pos = new Vector3().lerpVectors(camera2.position, nextCam2Pos, delta * 2);
+            let newCam2Pos = new Vector3().lerpVectors(camera2.position, nextCam2Pos, delta * 2);
             camera2.position.set(newCam2Pos.x, newCam2Pos.y, camera2.position.z);
 
             for (let i = 0; i < css3dObjArray.length; i++) {
@@ -820,7 +796,7 @@ $(function(){
                         }
                     });
 
-                var tween = new TWEEN.Tween(sphereGroup.scale) // Create a new tween that modifies 'coords'.
+                let tween = new TWEEN.Tween(sphereGroup.scale) // Create a new tween that modifies 'coords'.
                     .to({ x: 1, y: 1, z: 1 }, 2000) // Move to (300, 200) in 1 second.
                     .easing(TWEEN.Easing.Back.Out) // Use an easing function to make the animation smooth.
                     .onUpdate(() => { // Called after tween.js updates 'coords'.
@@ -847,9 +823,9 @@ $(function(){
 
     }
 
-    var numberOfAnims = 4;
+    const numberOfAnims = 4;
     function ToggleRandomAnimation() {
-        var randAnimIndex = Math.floor(Math.random() * numberOfAnims);
+        const randAnimIndex = Math.floor(Math.random() * numberOfAnims);
         if (currentAnimationIndex === randAnimIndex) {
             ToggleRandomAnimation();
         } else {
@@ -941,7 +917,7 @@ $(function(){
     });
 
     function scrollEventHandler(event) {
-        var delta = event.originalEvent.deltaY;
+        const delta = event.originalEvent.deltaY;
 
         if (currentWindowState === WindowStates.WORKS) {
             if (delta > 0)
