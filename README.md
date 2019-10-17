@@ -1,5 +1,7 @@
 # [johnlim.dev](https://johnlim.dev/)
 
+![Website Preview](https://user-images.githubusercontent.com/4276174/66977915-9e007b80-f05c-11e9-8631-610cb9621104.png "Website Preview")
+
 My personal website featuring some of my past works and projects.
 
 ## Prerequisites
