@@ -16,6 +16,8 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      DEPLOYMENT_RUN_ID: ${{ github.run_id }}
 
     permissions:
       contents: read

@@ -134,6 +134,34 @@ class WorkContainer extends React.Component {
     }
 }
 
+function BuildVersion() {
+    const commitSha = process.env.GITHUB_SHA || 'local';
+    const repository = process.env.GITHUB_REPOSITORY;
+    const serverUrl = process.env.GITHUB_SERVER_URL || 'https://github.com';
+    const runId = process.env.DEPLOYMENT_RUN_ID;
+    const commitUrl = repository && commitSha !== 'local' ? `${serverUrl}/${repository}/commit/${commitSha}` : null;
+    const deploymentUrl = repository && runId ? `${serverUrl}/${repository}/actions/runs/${runId}` : null;
+
+    return (
+        <div className="buildVersion" aria-label={`Build ${commitSha}`}>
+            <span>build </span>
+            {commitUrl ? (
+                <a href={commitUrl} target="_blank" rel="noopener noreferrer" title={`Commit ${commitSha}`}>
+                    {commitSha.slice(0, 7)}
+                </a>
+            ) : (
+                <span>{commitSha}</span>
+            )}
+            {deploymentUrl && (
+                <>
+                    <span aria-hidden="true"> · </span>
+                    <a href={deploymentUrl} target="_blank" rel="noopener noreferrer">deployment</a>
+                </>
+            )}
+        </div>
+    );
+}
+
 export class App extends React.Component {
     render() {
         const works = this.props.parsedJsonData.map((json) => <WorkContainer json={json} key={json.title} />);
@@ -141,6 +169,7 @@ export class App extends React.Component {
         return(
             <div className="workContainerContainer">
                 {works}
+                <BuildVersion />
             </div>
         );
     }
