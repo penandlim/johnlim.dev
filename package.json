@@ -12,6 +12,8 @@
   "scripts": {
     "start": "webpack-dev-server --open --mode development",
     "build": "cross-env NODE_ENV=production webpack --mode production",
+    "test": "node test/portfolio-content.test.js",
+    "lint": "eslint src/index.js src/App.jsx webpack.config.js",
     "stats": "cross-env NODE_ENV=production webpack --mode production --profile --json > stats.json"
   },
   "dependencies": {
@@ -30,6 +32,7 @@
   "devDependencies": {
     "@babel/cli": "^7.6.0",
     "@babel/core": "^7.6.0",
+    "@babel/eslint-parser": "^7.29.7",
     "@babel/preset-env": "^7.6.0",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
@@ -38,6 +41,7 @@
     "copy-webpack-plugin": "^5.0.4",
     "cross-env": "^5.2.1",
     "css-loader": "^3.2.0",
+    "eslint": "^8.57.1",
     "expose-loader": "^0.7.5",
     "html-inline-css-webpack-plugin": "^1.8.0",
     "html-loader": "^0.5.5",
