@@ -19,13 +19,13 @@
     "animejs": "^3.1.0",
     "bootstrap": "^4.3.1",
     "grained": "0.0.2",
-    "jquery": "^3.4.1",
+    "jquery": "^3.7.1",
     "loaders.css": "^0.1.2",
     "popper.js": "^1.15.0",
-    "postprocessing": "^6.7.0",
+    "postprocessing": "6.21.5",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "three": "^0.108.0"
+    "three": "^0.125.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.0",
