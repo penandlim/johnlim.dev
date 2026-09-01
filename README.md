@@ -8,16 +8,47 @@ My personal website featuring some of my past works and projects.
 
 * [Node](https://nodejs.org/en/)
 
-## Deployment
+## Getting started
 
-Install all required packages and generate dist folder by running the following commands.
+Clone the repository with its optional Unity helper submodule:
 
 ```bash
-npm install
+git clone --recurse-submodules https://github.com/penandlim/johnlim.dev.git
+cd johnlim.dev
+```
+
+For an existing checkout, initialize the submodule with:
+
+```bash
+git submodule update --init --recursive
+```
+
+The `johnlim.dev-Unity-Helper` submodule is kept as a separate git repository. It is not required to run the website locally or build the static site.
+
+## Development
+
+Install the locked dependencies and start the webpack development server:
+
+```bash
+npm ci
+npm start
+```
+
+## Deployment
+
+Install the locked dependencies and generate the `dist/` folder:
+
+```bash
+npm ci
 npm run build
 ```
 
-All necessary files will be packed and copied from src/ to dist/
+If webpack reports `ERR_OSSL_EVP_UNSUPPORTED` on a Node/OpenSSL 3 installation, rerun the affected command with the legacy provider enabled:
+
+```bash
+NODE_OPTIONS=--openssl-legacy-provider npm start
+NODE_OPTIONS=--openssl-legacy-provider npm run build
+```
 
 ## Built With
 
@@ -32,4 +63,4 @@ All necessary files will be packed and copied from src/ to dist/
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
