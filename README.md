@@ -7,6 +7,7 @@ My personal website featuring some of my past works and projects.
 ## Prerequisites
 
 * [Bun](https://bun.sh/) 1.4 or newer
+* [Node.js](https://nodejs.org/) 22.18 or newer
 
 ## Getting started
 

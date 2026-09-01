@@ -3,16 +3,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { animate } from 'animejs';
 import * as TWEEN from '@tweenjs/tween.js';
 import {
+    BackSide,
     BoxGeometry,
     Color,
+    CustomBlending,
     DirectionalLight,
     ImageLoader,
+    MaxEquation,
     Mesh,
     MeshBasicMaterial,
-    MeshPhongMaterial, Object3D, PerspectiveCamera, Raycaster, Scene, Vector2,
+    MeshPhongMaterial, Object3D, OneMinusSrcAlphaFactor, PerspectiveCamera, Raycaster, Scene, SrcAlphaFactor, Vector2,
     Vector3, WebGLRenderer
 } from "three";
-import * as THREE from 'three';
 
 import { EffectComposer, SMAAEffect, BlendFunction, DotScreenEffect, EffectPass, RenderPass } from 'postprocessing';
 import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
@@ -387,11 +389,11 @@ $(function(){
         const maxCount = 10;
         const perGap = 0.4;
 
-        outline_mat = new MeshBasicMaterial({color : 0x000000, transparent : true, opacity: 1,  side: THREE.BackSide, depthTest : false});
-        outline_mat.blending = THREE.CustomBlending;
-        outline_mat.blendEquation = THREE.MaxEquation;
-        outline_mat.blendSrc = THREE.SrcAlphaFactor; //default
-        outline_mat.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+        outline_mat = new MeshBasicMaterial({color : 0x000000, transparent : true, opacity: 1,  side: BackSide, depthTest : false});
+        outline_mat.blending = CustomBlending;
+        outline_mat.blendEquation = MaxEquation;
+        outline_mat.blendSrc = SrcAlphaFactor; //default
+        outline_mat.blendDst = OneMinusSrcAlphaFactor; //default
 
         let cube_geo = new BoxGeometry(  0.05, 0.05, 0.05  );
         let outline_geo = cube_geo.clone();
