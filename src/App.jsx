@@ -146,7 +146,7 @@ function BuildVersion() {
         <div className="buildVersion" aria-label={`Build ${commitSha}`}>
             <span>build </span>
             {commitUrl ? (
-                <a href={commitUrl} target="_blank" rel="noopener noreferrer" title={`Commit ${commitSha}`}>
+                <a href={commitUrl} target="_blank" rel="noopener noreferrer" aria-label={`View commit ${commitSha} on GitHub`} title={`Commit ${commitSha}`}>
                     {commitSha.slice(0, 7)}
                 </a>
             ) : (
@@ -155,7 +155,7 @@ function BuildVersion() {
             {deploymentUrl && (
                 <>
                     <span aria-hidden="true"> · </span>
-                    <a href={deploymentUrl} target="_blank" rel="noopener noreferrer">deployment</a>
+                    <a href={deploymentUrl} target="_blank" rel="noopener noreferrer" aria-label={`View deployment for commit ${commitSha} on GitHub Actions`}>deployment</a>
                 </>
             )}
         </div>

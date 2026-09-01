@@ -161,8 +161,7 @@ h2 {
     position: fixed;
     left: 1rem;
     bottom: 0.75rem;
-    z-index: 20;
-    color: rgba(1, 1, 1, .45);
+    color: #5c6064;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: .65rem;
     line-height: 1;
@@ -177,8 +176,7 @@ h2 {
 
 .buildVersion a:hover,
 .buildVersion a:focus {
-    color: rgba(1, 1, 1, .7);
-    text-decoration: underline;
+    color: #34383c;
 }
 
 @media (max-width: 30em) {

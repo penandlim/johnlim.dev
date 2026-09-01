@@ -57,7 +57,6 @@ module.exports = {
             'process.env.GITHUB_SHA': JSON.stringify(process.env.GITHUB_SHA || 'local'),
             'process.env.GITHUB_REPOSITORY': JSON.stringify(process.env.GITHUB_REPOSITORY || ''),
             'process.env.GITHUB_SERVER_URL': JSON.stringify(process.env.GITHUB_SERVER_URL || 'https://github.com'),
-            'process.env.GITHUB_RUN_ID': JSON.stringify(process.env.GITHUB_RUN_ID || ''),
             'process.env.DEPLOYMENT_RUN_ID': JSON.stringify(process.env.DEPLOYMENT_RUN_ID || '')
         }),
         new HtmlWebPackPlugin({
