@@ -150,6 +150,14 @@ h2 {
     z-index: 10;
 }
 
+.contactLinks a {
+    font-weight: 700;
+}
+
+.contactLinks a + a {
+    margin-left: 1rem;
+}
+
 
 .centered {
     position: fixed;

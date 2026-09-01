@@ -37,7 +37,7 @@ Object.defineProperty(Vector3.prototype, "lerpArray", {
 
 // export for others scripts to use
 window.$ = $;
-window.jQuery = jQuery;
+window.jQuery = $;
 
 let renderer, scene, camera, cube, then, composer, camera2, scene2, renderer2;
 let sphereArray = [];
@@ -844,6 +844,40 @@ $(function(){
 
     }
 
+    function previewVideoAt(index) {
+        if (!workContainers || index < 0 || index >= workContainers.length) {
+            return null;
+        }
+        return workContainers.eq(index).find("video").get(0) || null;
+    }
+
+    function playPreviewVideo(index) {
+        const video = previewVideoAt(index);
+        if (!video) {
+            return;
+        }
+
+        const playPromise = video.play();
+        if (playPromise && playPromise.catch) {
+            playPromise.catch(function() {});
+        }
+    }
+
+    function pausePreviewVideo(index) {
+        const video = previewVideoAt(index);
+        if (video) {
+            video.pause();
+        }
+    }
+
+    function pauseAllPreviewVideos() {
+        if (workContainers) {
+            workContainers.find("video").each(function() {
+                this.pause();
+            });
+        }
+    }
+
     const numberOfAnims = 4;
     function ToggleRandomAnimation() {
         const randAnimIndex = Math.floor(Math.random() * numberOfAnims);
@@ -953,6 +987,7 @@ $(function(){
     function scrollListDown() {
         if (!isListBeingScrolled && curCss3dObjIndex < css3dObjArray.length - 1) {
 
+            pausePreviewVideo(curCss3dObjIndex);
             isListBeingScrolled = true;
             topArrow.removeClass("dimmed");
 
@@ -990,6 +1025,7 @@ $(function(){
             }, 300);
 
             curCss3dObjIndex += 1;
+            playPreviewVideo(curCss3dObjIndex);
         }
 
         if (curCss3dObjIndex === css3dObjArray.length - 1) {
@@ -999,6 +1035,7 @@ $(function(){
 
     function scrollListUp() {
         if (!isListBeingScrolled && curCss3dObjIndex > 0) {
+            pausePreviewVideo(curCss3dObjIndex);
             bottomArrow.removeClass("dimmed");
 
             innerBar.css("top", (100 * (curCss3dObjIndex - 1 ) / totalWorksCount) + "%");
@@ -1037,6 +1074,7 @@ $(function(){
             }, 300);
 
             curCss3dObjIndex -= 1;
+            playPreviewVideo(curCss3dObjIndex);
         }
 
         if (curCss3dObjIndex === 0) {
@@ -1355,9 +1393,11 @@ $(function(){
             .easing(TWEEN.Easing.Cubic.Out)
             .delay(500)
             .start();
+        playPreviewVideo(curCss3dObjIndex);
     }
 
     function TransitionFromWorks() {
+        pauseAllPreviewVideos();
         sphereArray[0].material.wireframe = false;
         sphereArray[0].material.color.set(0xffffff);
         sphereArray[0].material.opacity = 1;
