@@ -179,3 +179,7 @@ fabric.properties
 
 dist
 stats.json
+# Local IDE, planning, and deployment backup files
+/.idea/
+/tickets/
+/johnlimdevOG.jpg
