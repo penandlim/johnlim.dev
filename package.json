@@ -5,6 +5,10 @@
   ],
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18",
+    "npm": ">=9"
+  },
   "scripts": {
     "start": "webpack-dev-server --open --mode development",
     "build": "cross-env NODE_ENV=production webpack --mode production",
@@ -42,7 +46,7 @@
     "mini-css-extract-plugin": "^0.8.0",
     "module-to-cdn": "^3.1.5",
     "style-loader": "^1.0.0",
-    "uglifyjs-webpack-plugin": "^2.2.0",
+    "terser-webpack-plugin": "^1.4.1",
     "webpack": "^4.40.2",
     "webpack-cli": "^3.3.8",
     "webpack-dev-server": "^3.8.0"

@@ -4,12 +4,14 @@ const CopyPlugin = require('copy-webpack-plugin');
 const DynamicCdnWebpackPlugin = require('dynamic-cdn-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
     entry: './src/index.js',
     output: {
         filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, 'dist'),
+        hashFunction: 'sha256'
     },
     devServer: {
         contentBase: 'src/', //disk location
@@ -36,6 +38,14 @@ module.exports = {
                 test: /\.css$/,
                 use: [MiniCssExtractPlugin.loader, 'css-loader']
             }
+        ]
+    },
+    optimization: {
+        concatenateModules: false,
+        minimizer: [
+            new TerserPlugin({
+                cache: false
+            })
         ]
     },
     plugins: [
