@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { animate } from 'animejs';
+import { animate as anime } from 'animejs';
 import * as TWEEN from '@tweenjs/tween.js';
 import {
     BackSide,
@@ -807,7 +807,7 @@ $(function(){
                 $("#actualBody").fadeTo(1000, 1);
                 $("#threejs").fadeTo(1000, 1);
 
-                animate('.letter', {
+                anime('.letter', {
                     translateY: ["1.8em", 0],
                     translateZ: 0,
                     duration: 750,
