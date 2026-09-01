@@ -14,8 +14,10 @@ module.exports = {
         hashFunction: 'sha256'
     },
     devServer: {
-        contentBase: 'src/', //disk location
-        watchContentBase: true
+        static: {
+            directory: path.resolve(__dirname, 'src'),
+            watch: true
+        }
     },
     module: {
         rules: [
@@ -43,9 +45,7 @@ module.exports = {
     optimization: {
         concatenateModules: false,
         minimizer: [
-            new TerserPlugin({
-                cache: false
-            })
+            new TerserPlugin()
         ]
     },
     plugins: [
@@ -64,14 +64,16 @@ module.exports = {
             filename: "./index.html"
         }),
         new HTMLInlineCSSWebpackPlugin(),
-        new CopyPlugin([
-            { from: 'src/webfonts', to: 'webfonts' },
-            { from: 'src/css', to: 'css' },
-            { from: 'src/works.json', to: 'works.json' },
-            { from : 'src/videos', to: 'videos'},
-            { from : 'src/img', to: 'img'},
-            { from: "src/unityprojects", to: "unityprojects"}
-        ])
+        new CopyPlugin({
+            patterns: [
+                { from: 'src/webfonts', to: 'webfonts' },
+                { from: 'src/css', to: 'css' },
+                { from: 'src/works.json', to: 'works.json' },
+                { from: 'src/videos', to: 'videos' },
+                { from: 'src/img', to: 'img' },
+                { from: 'src/unityprojects', to: 'unityprojects' }
+            ]
+        })
 
     ],
     mode: 'production'
