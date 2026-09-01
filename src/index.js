@@ -106,9 +106,6 @@ areaImage = loader.load(SMAAEffect.areaImageDataURL);
 
 let isListBeingScrolled = false;
 
-// Obtain the root
-const rootElement = document.getElementById('root');
-const reactRoot = createRoot(rootElement);
 
 const mainEl = $("main");
 
@@ -202,6 +199,12 @@ let AnimToComplexCubeFn;
 let css3dObjGroupOffset = -10;
 
 $(function(){
+    const rootElement = document.getElementById('root');
+    if (!rootElement) {
+        throw new Error('Missing #root element');
+    }
+    const reactRoot = createRoot(rootElement);
+
 
     innerBar = $(".innerBar");
     outerBar = $(".outerBar");
