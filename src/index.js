@@ -37,7 +37,7 @@ Object.defineProperty(Vector3.prototype, "lerpArray", {
 
 // export for others scripts to use
 window.$ = $;
-window.jQuery = jQuery;
+window.jQuery = $;
 
 let renderer, scene, camera, cube, then, composer, camera2, scene2, renderer2;
 let sphereArray = [];
