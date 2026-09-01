@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -51,6 +52,12 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: "[name].css",
             chunkFilename: "[id].css"
+        }),
+        new webpack.DefinePlugin({
+            'process.env.GITHUB_SHA': JSON.stringify(process.env.GITHUB_SHA || 'local'),
+            'process.env.GITHUB_REPOSITORY': JSON.stringify(process.env.GITHUB_REPOSITORY || ''),
+            'process.env.GITHUB_SERVER_URL': JSON.stringify(process.env.GITHUB_SERVER_URL || 'https://github.com'),
+            'process.env.DEPLOYMENT_RUN_ID': JSON.stringify(process.env.DEPLOYMENT_RUN_ID || '')
         }),
         new HtmlWebPackPlugin({
             template: "./src/index.html",
