@@ -208,6 +208,9 @@ $(function(){
         scrollListDown();
     });
 
+    const loadError = $("#loadError");
+    const retryLoad = $("#retryLoad");
+
     grained("#grain", {
         animate: true,
         patternWidth: 260,
@@ -218,22 +221,40 @@ $(function(){
         grainHeight: 2.2
     });
 
-    fetch("works.json")
-        .then(response => response.json())
-        .then((jsonData) => {
-            const parsedJsonData = jsonData.works;
-            totalWorksCount = jsonData.works.length;
-            ReactDOM.render(
-                <App parsedJsonData={parsedJsonData}/>,
-                rootElement, function() {
-                    finishLoading();
+    function loadWorks() {
+        loadError.attr("hidden", true);
+        $("#spinner").show();
+
+        fetch("works.json")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Unable to load works.json (${response.status})`);
                 }
-            );
-        })
-        .catch((error) => {
-            // handle your errors here
-            console.error(error)
-        });
+                return response.json();
+            })
+            .then((jsonData) => {
+                if (!jsonData || !Array.isArray(jsonData.works) || jsonData.works.length === 0) {
+                    throw new Error("works.json must contain a non-empty works array");
+                }
+
+                const parsedJsonData = jsonData.works;
+                totalWorksCount = parsedJsonData.length;
+                ReactDOM.render(
+                    <App parsedJsonData={parsedJsonData}/>,
+                    rootElement, function() {
+                        finishLoading();
+                    }
+                );
+            })
+            .catch((error) => {
+                console.error(error);
+                $("#spinner").hide();
+                loadError.removeAttr("hidden");
+            });
+    }
+
+    retryLoad.on("click", loadWorks);
+    loadWorks();
 
     let textWrapper = document.querySelector('.letters');
     textWrapper.innerHTML = textWrapper.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
