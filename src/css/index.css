@@ -167,6 +167,19 @@ h2 {
     transform: translate(-50%, -50%);
 }
 
+.loadError {
+    z-index: 200;
+    width: min(90vw, 26rem);
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid #111;
+    border-radius: 1rem;
+}
+
+.loadError p {
+    margin-bottom: 1rem;
+}
+
 canvas {
     display: block; /* fix necessary to remove space at bottom of canvas */
 }
