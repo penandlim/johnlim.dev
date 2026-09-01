@@ -17,7 +17,7 @@ class PreviewYoutube extends React.Component {
     render() {
         return (
             <iframe className="previewContent" src={this.props.previewSrc}
-                    style={{display: "inline"}} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen>
+                    loading="lazy" style={{display: "inline"}} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen>
             </iframe>
         );
     }
@@ -26,7 +26,7 @@ class PreviewYoutube extends React.Component {
 class PreviewVideo extends React.Component {
     render() {
         return (
-            <video className="previewContent" autoPlay loop muted>
+            <video className="previewContent" loop muted playsInline preload="none">
                 <source src={this.props.previewSrc} type="video/mp4" />
                     Your browser does not support the video tag.
             </video>
@@ -37,8 +37,7 @@ class PreviewVideo extends React.Component {
 class PreviewImg extends React.Component {
     render() {
         return (
-            <img className="previewContent" src={this.props.previewSrc} alt="Preview Image">
-            </img>
+            <img className="previewContent" src={this.props.previewSrc} loading="lazy" decoding="async" alt="Preview Image" />
         );
     }
 }
