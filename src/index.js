@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import anime from 'animejs/lib/anime.es';
-import TWEEN from '@tweenjs/tween.js';
+import { animate } from 'animejs';
+import * as TWEEN from '@tweenjs/tween.js';
 import {
     BoxGeometry,
     Color,
@@ -12,12 +12,13 @@ import {
     MeshPhongMaterial, Object3D, PerspectiveCamera, Raycaster, Scene, Vector2,
     Vector3, WebGLRenderer
 } from "three";
-import * as THREE from 'three/src/constants';
+import * as THREE from 'three';
 
-import { EffectComposer, SMAAEffect, BlendFunction, DotScreenEffect, EffectPass, RenderPass } from 'postprocessing/build/postprocessing.esm';
-import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
+import { EffectComposer, SMAAEffect, BlendFunction, DotScreenEffect, EffectPass, RenderPass } from 'postprocessing';
+import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
 import { App } from './App.jsx';
 import 'loaders.css/loaders.min.css';
 
@@ -64,12 +65,14 @@ let wireframeArray = [];
 let speedMultiplier = 3;
 
 let tweenZoomAction;
+const tweenGroup = new TWEEN.Group();
 
 let rotationSpeedMultiplier = {y: 1};
 
 const Vector3zero = new Vector3(0, 0, 0);
 const Vector3one = new Vector3(1, 1, 1);
 const Vector3two = new Vector3(2, 2, 2);
+const rotationVector = new Vector3();
 
 let defaultCamPos, nextCamPos = new Vector2();
 let nextCam2Pos = new Vector2(0, 0);
@@ -103,6 +106,7 @@ let isListBeingScrolled = false;
 
 // Obtain the root
 const rootElement = document.getElementById('root');
+const reactRoot = createRoot(rootElement);
 
 const mainEl = $("main");
 
@@ -239,12 +243,10 @@ $(function(){
 
                 const parsedJsonData = jsonData.works;
                 totalWorksCount = parsedJsonData.length;
-                ReactDOM.render(
-                    <App parsedJsonData={parsedJsonData}/>,
-                    rootElement, function() {
-                        finishLoading();
-                    }
-                );
+                flushSync(() => {
+                    reactRoot.render(<App parsedJsonData={parsedJsonData}/>);
+                });
+                finishLoading();
             })
             .catch((error) => {
                 console.error(error);
@@ -274,13 +276,13 @@ $(function(){
                     let intersectedObj = intersects[0].object;
                     if (lastRaycastedObj !== intersectedObj) {
 
-                        new TWEEN.Tween(intersectedObj.userData)
+                        new TWEEN.Tween(intersectedObj.userData, tweenGroup)
                             .to({ scaleMultiplier: 2}, 1)
                             .easing(TWEEN.Easing.Back.Out) // Use an easing function to make the animation smooth.
                             .start(); // Start the tween immediately.
 
                         if (!(lastRaycastedObj == null)) {
-                            new TWEEN.Tween(lastRaycastedObj.userData)
+                            new TWEEN.Tween(lastRaycastedObj.userData, tweenGroup)
                                 .to({scaleMultiplier: 1}, 1)
                                 .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
                                 .start(); // Start the tween immediately.
@@ -293,7 +295,7 @@ $(function(){
 
                 } else {
                     if (!(lastRaycastedObj == null)) {
-                        new TWEEN.Tween(lastRaycastedObj.userData)
+                        new TWEEN.Tween(lastRaycastedObj.userData, tweenGroup)
                             .to({scaleMultiplier: 1}, 1)
                             .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
                             .start(); // Start the tween immediately.
@@ -305,15 +307,15 @@ $(function(){
                 if (intersects.length > 0) {
                     if (lastRaycastedGroup !== intersects[0].object.parent) {
                         if (!(intersects[0].object.parent.userData.tween == null))
-                            TWEEN.remove(intersects[0].object.parent.userData.tween);
-                        intersects[0].object.parent.userData.tween = new TWEEN.Tween(intersects[0].object.parent.children[0].material.color)
+                            tweenGroup.remove(intersects[0].object.parent.userData.tween);
+                        intersects[0].object.parent.userData.tween = new TWEEN.Tween(intersects[0].object.parent.children[0].material.color, tweenGroup)
                             .to({r: 1, g: 0, b: 0}, 500)
                             .start(); // Start the tween immediately.
 
                         if (!(lastRaycastedGroup == null)) {
                             if (!(lastRaycastedGroup.userData.tween == null))
-                                TWEEN.remove(lastRaycastedGroup.userData.tween);
-                            lastRaycastedGroup.userData.tween = new TWEEN.Tween(lastRaycastedGroup.children[0].material.color)
+                                tweenGroup.remove(lastRaycastedGroup.userData.tween);
+                            lastRaycastedGroup.userData.tween = new TWEEN.Tween(lastRaycastedGroup.children[0].material.color, tweenGroup)
                                 .to({r: 1, g: 1, b: 1}, 300)
                                 .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
                                 .start(); // Start the tween immediately.
@@ -329,8 +331,8 @@ $(function(){
                 } else {
                     if (!(lastRaycastedGroup == null)) {
                         if (!(lastRaycastedGroup.userData.tween == null))
-                            TWEEN.remove(lastRaycastedGroup.userData.tween);
-                        lastRaycastedGroup.userData.tween = new TWEEN.Tween(lastRaycastedGroup.children[0].material.color)
+                            tweenGroup.remove(lastRaycastedGroup.userData.tween);
+                        lastRaycastedGroup.userData.tween = new TWEEN.Tween(lastRaycastedGroup.children[0].material.color, tweenGroup)
                             .to({r: 1, g: 1, b: 1}, 300)
                             .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
                             .start(); // Start the tween immediately.
@@ -455,17 +457,17 @@ $(function(){
         sphereGroup.scale.set(0.01, 0.01, 0.01);
         sphereGroup.position.set(sphereGroup.position.x, sphereGroup.position.y - 0.2, sphereGroup.position.z);
 
-        let directionalLight = new DirectionalLight( 0xff7722, 1 );
+        let directionalLight = new DirectionalLight( 0xff7722, Math.PI );
         directionalLight.position.set(0,2,1);
 
         scene.add( directionalLight );
 
-        directionalLight = new DirectionalLight( 0x2288ff, 1.1 );
+        directionalLight = new DirectionalLight( 0x2288ff, 1.1 * Math.PI );
         directionalLight.position.set(-2,-2,3);
 
         scene.add( directionalLight );
 
-        directionalLight = new DirectionalLight( 0x00ffff, 0.5 );
+        directionalLight = new DirectionalLight( 0x00ffff, 0.5 * Math.PI );
         directionalLight.position.set(2,0,0);
 
         scene.add( directionalLight );
@@ -639,7 +641,7 @@ $(function(){
 
                             sphereArray[index].position.lerp(newPos, delta * speedMultiplier + i * 0.001);
                             sphereArray[index].scale.lerp(newScale, delta * speedMultiplier + i * 0.001);
-                            sphereArray[index].rotation.setFromVector3(sphereArray[index].rotation.toVector3().lerp(sphereRotArray[index], delta * speedMultiplier + i * 0.001), "YXZ");
+                            sphereArray[index].rotation.setFromVector3(rotationVector.setFromEuler(sphereArray[index].rotation).lerp(sphereRotArray[index], delta * speedMultiplier + i * 0.001), "YXZ");
                             // sphereArray[index].material.color.lerp(sphereGoToColorArray[index], delta);
                         } else if (currentWindowState === WindowStates.WORKS) {
                             const newPos = sphereGoToPosArray[index].clone().multiplyScalar(sphereGroupModifier.pos);
@@ -647,14 +649,14 @@ $(function(){
 
                             sphereArray[index].position.lerp(newPos, delta * speedMultiplier + i * 0.001);
                             sphereArray[index].scale.lerp(newScale, delta * speedMultiplier + i * 0.001);
-                            sphereArray[index].rotation.setFromVector3(sphereArray[index].rotation.toVector3().lerp(sphereRotArray[index], delta * speedMultiplier + i * 0.001), "YXZ");
+                            sphereArray[index].rotation.setFromVector3(rotationVector.setFromEuler(sphereArray[index].rotation).lerp(sphereRotArray[index], delta * speedMultiplier + i * 0.001), "YXZ");
                             // sphereArray[index].material.color.lerp(sphereGoToColorArray[index], delta);
 
                         } else if (currentWindowState === WindowStates.CONTACT) {
                             if (index < 250) {
                                 if (index < githubIconPosArray.length) {
                                     githubIconGroup.children[index].position.lerpArray(githubIconPosArray[index], delta * speedMultiplier + i * 0.001);
-                                    githubIconGroup.children[index].rotation.setFromVector3(githubIconGroup.children[index].rotation.toVector3().lerpArray( [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
+                                    githubIconGroup.children[index].rotation.setFromVector3(rotationVector.setFromEuler(githubIconGroup.children[index].rotation).lerpArray( [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
                                     githubIconGroup.children[index].scale.lerpArray(githubIconScale, delta * speedMultiplier + i * 0.001);
                                 } else {
                                     githubIconGroup.children[index].position.lerpArray(githubIconPosOffset, delta * speedMultiplier + i * 0.001);
@@ -664,7 +666,7 @@ $(function(){
                                 index = index - 250;
                                 if (index < linkedinIconPosArray.length) {
                                     linkedinIconGroup.children[index].position.lerpArray(linkedinIconPosArray[index], delta * speedMultiplier + i * 0.001);
-                                    linkedinIconGroup.children[index].rotation.setFromVector3(linkedinIconGroup.children[index].rotation.toVector3().lerpArray([0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
+                                    linkedinIconGroup.children[index].rotation.setFromVector3(rotationVector.setFromEuler(linkedinIconGroup.children[index].rotation).lerpArray([0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
                                     linkedinIconGroup.children[index].scale.lerpArray( linkedinIconScale, delta * speedMultiplier + i * 0.001);
                                 } else {
                                     linkedinIconGroup.children[index].position.lerpArray(linkedinIconPosOffset, delta * speedMultiplier + i * 0.001);
@@ -674,7 +676,7 @@ $(function(){
                                 index = index - 500;
                                 if (index < facebookIconPosArray.length) {
                                     facebookIconGroup.children[index].position.lerpArray( facebookIconPosArray[index], delta * speedMultiplier + i * 0.001);
-                                    facebookIconGroup.children[index].rotation.setFromVector3(facebookIconGroup.children[index].rotation.toVector3().lerpArray([0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
+                                    facebookIconGroup.children[index].rotation.setFromVector3(rotationVector.setFromEuler(facebookIconGroup.children[index].rotation).lerpArray([0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
                                     facebookIconGroup.children[index].scale.lerpArray( facebookIconScale, delta * speedMultiplier + i * 0.001);
                                 } else {
                                     facebookIconGroup.children[index].position.lerpArray(facebookIconPosOffset, delta * speedMultiplier + i * 0.001);
@@ -684,7 +686,7 @@ $(function(){
                                 index = index - 750;
                                 if (index < twitterIconPosArray.length) {
                                     twitterIconGroup.children[index].position.lerpArray( twitterIconPosArray[index], delta * speedMultiplier + i * 0.001);
-                                    twitterIconGroup.children[index].rotation.setFromVector3(twitterIconGroup.children[index].rotation.toVector3().lerpArray( [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
+                                    twitterIconGroup.children[index].rotation.setFromVector3(rotationVector.setFromEuler(twitterIconGroup.children[index].rotation).lerpArray( [0.0001, 0.0001, 0.0001], delta * speedMultiplier + i * 0.001), "YXZ");
                                     twitterIconGroup.children[index].scale.lerpArray(twitterIconScale, delta * speedMultiplier + i * 0.001);
                                 } else {
                                     twitterIconGroup.children[index].position.lerpArray( twitterIconPosOffset, delta * speedMultiplier + i * 0.001);
@@ -710,11 +712,11 @@ $(function(){
                 sphereGroup.rotateY(delta * 0.5 * rotationSpeedMultiplier.y);
 
             } else if (currentWindowState === WindowStates.CONTACT) {
-                sphereGroup.rotation.setFromVector3(sphereGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
-                githubIconGroup.rotation.setFromVector3(githubIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
-                linkedinIconGroup.rotation.setFromVector3(linkedinIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
-                facebookIconGroup.rotation.setFromVector3(facebookIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
-                twitterIconGroup.rotation.setFromVector3(twitterIconGroup.rotation.toVector3().lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
+                sphereGroup.rotation.setFromVector3(rotationVector.setFromEuler(sphereGroup.rotation).lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
+                githubIconGroup.rotation.setFromVector3(rotationVector.setFromEuler(githubIconGroup.rotation).lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
+                linkedinIconGroup.rotation.setFromVector3(rotationVector.setFromEuler(linkedinIconGroup.rotation).lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
+                facebookIconGroup.rotation.setFromVector3(rotationVector.setFromEuler(facebookIconGroup.rotation).lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
+                twitterIconGroup.rotation.setFromVector3(rotationVector.setFromEuler(twitterIconGroup.rotation).lerpArray( [0, 0, 0], delta * speedMultiplier), "YXZ");
             }
 
 
@@ -725,7 +727,7 @@ $(function(){
             // camera2.position.set(newCam2Pos.x, newCam2Pos.y, camera2.position.z);
 
             for (let i = 0; i < css3dObjArray.length; i++) {
-                css3dObjArray[i].rotation.setFromVector3(css3dObjArray[i].rotation.toVector3().lerp( css3dObjNextRot, delta * 3));
+                css3dObjArray[i].rotation.setFromVector3(rotationVector.setFromEuler(css3dObjArray[i].rotation).lerp( css3dObjNextRot, delta * 3));
             }
         }
 
@@ -772,7 +774,7 @@ $(function(){
             MouseRaycast(delta);
 
 
-            TWEEN.update();
+            tweenGroup.update();
             render(delta);
         }
 
@@ -803,21 +805,20 @@ $(function(){
                 $("#actualBody").fadeTo(1000, 1);
                 $("#threejs").fadeTo(1000, 1);
 
-                anime({
-                        targets: '.letter',
-                        translateY: ["1.8em", 0],
-                        translateZ: 0,
-                        duration: 750,
-                        delay: (el, i) => 1000 + 50 * i,
-                        complete: function() {
-                            $("h2").css("font-size", "2rem");
-                            $(".nav").fadeTo(1000, 1);
-                            $(".slider").css("width", "100%");
+                animate('.letter', {
+                    translateY: ["1.8em", 0],
+                    translateZ: 0,
+                    duration: 750,
+                    delay: (el, i) => 1000 + 50 * i,
+                    onComplete: function() {
+                        $("h2").css("font-size", "2rem");
+                        $(".nav").fadeTo(1000, 1);
+                        $(".slider").css("width", "100%");
 
-                        }
-                    });
+                    }
+                });
 
-                let tween = new TWEEN.Tween(sphereGroup.scale) // Create a new tween that modifies 'coords'.
+                let tween = new TWEEN.Tween(sphereGroup.scale, tweenGroup) // Create a new tween that modifies 'coords'.
                     .to({ x: 1, y: 1, z: 1 }, 2000) // Move to (300, 200) in 1 second.
                     .easing(TWEEN.Easing.Back.Out) // Use an easing function to make the animation smooth.
                     .onUpdate(() => { // Called after tween.js updates 'coords'.
@@ -994,25 +995,25 @@ $(function(){
             innerBar.css("top", (100 * (curCss3dObjIndex + 1 ) / totalWorksCount) + "%");
 
             if (css3dObjArray[curCss3dObjIndex].userData.tween) {
-                TWEEN.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
+                tweenGroup.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
             }
-            css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+            css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale, tweenGroup)
                 .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
                 .easing(TWEEN.Easing.Cubic.Out)
                 .start();
 
             if (css3dObjArray[curCss3dObjIndex + 1].userData.tween) {
-                TWEEN.remove(css3dObjArray[curCss3dObjIndex + 1].userData.tween);
+                tweenGroup.remove(css3dObjArray[curCss3dObjIndex + 1].userData.tween);
             }
-            css3dObjArray[curCss3dObjIndex + 1].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex + 1].scale)
+            css3dObjArray[curCss3dObjIndex + 1].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex + 1].scale, tweenGroup)
                 .to({x: 1, y: 1, z: 1}, 800)
                 .easing(TWEEN.Easing.Back.Out)
                 .start();
 
             if (css3dObjGroup.userData.tween) {
-                TWEEN.remove(css3dObjGroup.userData.tween);
+                tweenGroup.remove(css3dObjGroup.userData.tween);
             }
-            css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
+            css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position, tweenGroup) // Create a new tween that modifies 'coords'.
                 .to({ y: 1000 * (curCss3dObjIndex + 1) + css3dObjGroupOffset }, 800) // Move to (300, 200) in 1 second.
                 .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
                 // .onComplete(function() {
@@ -1043,25 +1044,25 @@ $(function(){
             isListBeingScrolled = true;
 
             if (css3dObjArray[curCss3dObjIndex].userData.tween) {
-                TWEEN.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
+                tweenGroup.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
             }
-            css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+            css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale, tweenGroup)
                 .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
                 .easing(TWEEN.Easing.Cubic.Out)
                 .start();
 
             if (css3dObjArray[curCss3dObjIndex - 1].userData.tween) {
-                TWEEN.remove(css3dObjArray[curCss3dObjIndex - 1].userData.tween);
+                tweenGroup.remove(css3dObjArray[curCss3dObjIndex - 1].userData.tween);
             }
-            css3dObjArray[curCss3dObjIndex - 1].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex - 1].scale)
+            css3dObjArray[curCss3dObjIndex - 1].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex - 1].scale, tweenGroup)
                 .to({x: 1, y: 1, z: 1}, 800)
                 .easing(TWEEN.Easing.Quadratic.InOut)
                 .start();
 
             if (css3dObjGroup.userData.tween) {
-                TWEEN.remove(css3dObjGroup.userData.tween);
+                tweenGroup.remove(css3dObjGroup.userData.tween);
             }
-            css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position) // Create a new tween that modifies 'coords'.
+            css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position, tweenGroup) // Create a new tween that modifies 'coords'.
                 .to({ y: 1000 * (curCss3dObjIndex - 1) + css3dObjGroupOffset }, 800) // Move to (300, 200) in 1 second.
                 .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
                 // .onComplete(function() {
@@ -1126,7 +1127,7 @@ $(function(){
             if (tweenZoomAction == null) {
 
             } else {
-                TWEEN.remove(tweenZoomAction);
+                tweenGroup.remove(tweenZoomAction);
             }
 
 
@@ -1136,16 +1137,16 @@ $(function(){
                 $(document.body).css("background-color", "#ffd2d3");
 
                 if ( outline.userData.tween ) {
-                    TWEEN.remove( outline.userData.tween );
+                    tweenGroup.remove(outline.userData.tween);
                 }
-                outline.userData.tween = new TWEEN.Tween(outline.material)
+                outline.userData.tween = new TWEEN.Tween(outline.material, tweenGroup)
                     .to({opacity : 0}, 500)
                     .start();
 
                 if (sphereGroupModifierTween) {
-                    TWEEN.remove(sphereGroupModifierTween);
+                    tweenGroup.remove(sphereGroupModifierTween);
                 }
-                sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
+                sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier, tweenGroup)
                     .to({pos: 1.5}, 100)
                     .easing(TWEEN.Easing.Cubic.Out)
                     .start();
@@ -1180,15 +1181,15 @@ $(function(){
                 }, 5000);
 
                 if ( outline.userData.tween ) {
-                    TWEEN.remove( outline.userData.tween );
+                    tweenGroup.remove(outline.userData.tween);
                 }
-                outline.userData.tween = new TWEEN.Tween(outline.material).to({opacity: 1}, 500).start();
+                outline.userData.tween = new TWEEN.Tween(outline.material, tweenGroup).to({opacity: 1}, 500).start();
 
                 if (sphereGroupModifierTween) {
-                    TWEEN.remove(sphereGroupModifierTween);
+                    tweenGroup.remove(sphereGroupModifierTween);
                 }
 
-                sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
+                sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier, tweenGroup)
                     .to({pos: 1}, 100)
                     .easing(TWEEN.Easing.Cubic.Out)
                     .start();
@@ -1197,7 +1198,7 @@ $(function(){
 
             } else {
                 if (!(lastRaycastedGroup == null) && linkToOpen !== "") {
-                    new TWEEN.Tween(lastRaycastedGroup.children[0].material.color)
+                    new TWEEN.Tween(lastRaycastedGroup.children[0].material.color, tweenGroup)
                         .to({r: 1, g: 1, b: 1}, 300)
                         .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
                         .start(); // Start the tween immediately.
@@ -1207,7 +1208,7 @@ $(function(){
 
 
 
-            // new TWEEN.Tween(dotScreenEffect.blendMode.opacity)
+            // new TWEEN.Tween(dotScreenEffect.blendMode.opacity, tweenGroup)
             //     .to({value: 1.0}, 500).start();
 
 
@@ -1318,7 +1319,7 @@ $(function(){
         nextCamPos.y = 0.3;
 
         if (!(lastRaycastedGroup == null)) {
-            new TWEEN.Tween(lastRaycastedGroup.children[0].material.color)
+            new TWEEN.Tween(lastRaycastedGroup.children[0].material.color, tweenGroup)
                 .to({r: 1, g: 1, b: 1}, 300)
                 .easing(TWEEN.Easing.Cubic.Out) // Use an easing function to make the animation smooth.
                 .start(); // Start the tween immediately.
@@ -1361,14 +1362,14 @@ $(function(){
         sphereArray[750].material.color.set(0x000000);
         sphereArray[750].material.opacity = 0.3;
         if ( outline.userData.tween ) {
-            TWEEN.remove( outline.userData.tween );
+            tweenGroup.remove(outline.userData.tween);
         }
         outline.material.opacity = 0;
 
         if (sphereGroupModifierTween) {
-            TWEEN.remove(sphereGroupModifierTween);
+            tweenGroup.remove(sphereGroupModifierTween);
         }
-        sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
+        sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier, tweenGroup)
             .to({pos: 1.5}, 100)
             .easing(TWEEN.Easing.Cubic.Out)
             .start();
@@ -1385,10 +1386,10 @@ $(function(){
 
 
         if (css3dObjArray[curCss3dObjIndex].userData.tween) {
-            TWEEN.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
+            tweenGroup.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
         }
         css3dObjArray[curCss3dObjIndex].scale.set(0.0001, 0.0001, 0.0001);
-        css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+        css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale, tweenGroup)
             .to({x: 1, y: 1, z: 1}, 800)
             .easing(TWEEN.Easing.Cubic.Out)
             .delay(500)
@@ -1411,22 +1412,22 @@ $(function(){
         sphereArray[750].material.color.set(0xffffff);
         sphereArray[750].material.opacity = 1;
         if ( outline.userData.tween ) {
-            TWEEN.remove( outline.userData.tween );
+            tweenGroup.remove(outline.userData.tween);
         }
-        outline.userData.tween = new TWEEN.Tween(outline.material).to({opacity: 1}, 100).start();
+        outline.userData.tween = new TWEEN.Tween(outline.material, tweenGroup).to({opacity: 1}, 100).start();
 
         if (sphereGroupModifierTween) {
-            TWEEN.remove(sphereGroupModifierTween);
+            tweenGroup.remove(sphereGroupModifierTween);
         }
-        sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier)
+        sphereGroupModifierTween = new TWEEN.Tween(sphereGroupModifier, tweenGroup)
             .to({pos: 1}, 100)
             .easing(TWEEN.Easing.Cubic.Out)
             .start();
 
         if (css3dObjArray[curCss3dObjIndex].userData.tween) {
-            TWEEN.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
+            tweenGroup.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
         }
-        css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale)
+        css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale, tweenGroup)
             .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
             .easing(TWEEN.Easing.Cubic.Out)
             .start();
