@@ -17,7 +17,7 @@ class PreviewYoutube extends React.Component {
     render() {
         return (
             <iframe className="previewContent" src={this.props.previewSrc}
-                    loading="lazy" style={{display: "inline"}} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen>
+                    loading="lazy" title={`${this.props.title} video preview`} style={{display: "inline"}} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen>
             </iframe>
         );
     }
@@ -37,7 +37,7 @@ class PreviewVideo extends React.Component {
 class PreviewImg extends React.Component {
     render() {
         return (
-            <img className="previewContent" src={this.props.previewSrc} loading="lazy" decoding="async" alt="Preview Image" />
+            <img className="previewContent" src={this.props.previewSrc} loading="lazy" decoding="async" alt={`${this.props.title} preview image`} />
         );
     }
 }
@@ -47,11 +47,11 @@ class Preview extends React.Component {
     render() {
         var previewContent;
         if (this.props.type === "youtube") {
-            previewContent = <PreviewYoutube previewSrc={this.props.previewSrc} />;
+            previewContent = <PreviewYoutube title={this.props.title} previewSrc={this.props.previewSrc} />;
         } else if (this.props.type === "video") {
             previewContent = <PreviewVideo previewSrc={this.props.previewSrc} />
         } else if (this.props.type === "img") {
-            previewContent = <PreviewImg previewSrc={this.props.previewSrc} />
+            previewContent = <PreviewImg title={this.props.title} previewSrc={this.props.previewSrc} />
         }
 
         return (
@@ -89,8 +89,8 @@ class Description extends React.Component {
 class Link extends React.Component {
     render() {
         return(
-            <a href={this.props.url} target="_blank">
-                <i className={this.props.fa  + " fa-2x"}/>
+            <a href={this.props.url} target="_blank" rel="noopener noreferrer" aria-label={this.props.label}>
+                <i aria-hidden="true" className={this.props.fa  + " fa-2x"}/>
             </a>
         );
     }
@@ -102,12 +102,12 @@ class Links extends React.Component {
         var links = [];
         if (this.props.links.direct) {
             this.props.links.direct.forEach(function(e) {
-                links.push(<Link key={e} url={e} fa="fas fa-external-link-alt" />);
+                links.push(<Link key={`direct-${e}`} url={e} fa="fas fa-external-link-alt" label="Open project website" />);
             });
         }
         if (this.props.links.github) {
             this.props.links.github.forEach(function(e) {
-                links.push(<Link key={e} url={e} fa="fab fa-github" />);
+                links.push(<Link key={`github-${e}`} url={e} fa="fab fa-github" label="Open GitHub repository" />);
             });
         }
 
@@ -126,7 +126,7 @@ class WorkContainer extends React.Component {
         return (
             <div className="workContainer something">
                 <Title title={this.props.json.title}/>
-                <Preview type={this.props.json.previewType} previewSrc={this.props.json.previewSrc} />
+                <Preview title={this.props.json.title} type={this.props.json.previewType} previewSrc={this.props.json.previewSrc} />
                 <Description descriptionText={this.props.json.descriptionText} keywords={this.props.json.keywords}/>
                 <Links links={this.props.json.links}/>
             </div>
