@@ -150,6 +150,14 @@ h2 {
     z-index: 10;
 }
 
+.contactLinks a {
+    font-weight: 700;
+}
+
+.contactLinks a + a {
+    margin-left: 1rem;
+}
+
 
 .centered {
     position: fixed;
@@ -157,6 +165,19 @@ h2 {
     left: 50%;
     /* bring your own prefixes */
     transform: translate(-50%, -50%);
+}
+
+.loadError {
+    z-index: 200;
+    width: min(90vw, 26rem);
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid #111;
+    border-radius: 1rem;
+}
+
+.loadError p {
+    margin-bottom: 1rem;
 }
 
 canvas {
