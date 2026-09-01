@@ -14,11 +14,6 @@ module.exports = [
                 }
             },
             globals: {
-                '$': 'readonly',
-                jQuery: 'readonly',
-                React: 'readonly',
-                ReactDOM: 'readonly',
-                THREE: 'readonly',
                 grained: 'readonly'
             }
         },
