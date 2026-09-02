@@ -86,6 +86,22 @@ class Description extends React.Component {
     }
 }
 
+function linkLabel(url, linkType, title) {
+    const parsedUrl = new URL(url);
+    const host = parsedUrl.hostname.replace(/^www\./, "");
+    const path = parsedUrl.pathname.split("/").filter(Boolean);
+
+    if (linkType === "github") {
+        const repository = path.slice(0, 2).join("/");
+        if (path[2] === "pull" && path[3]) {
+            return `Open GitHub pull request #${path[3]} for ${repository}`;
+        }
+        return `Open GitHub repository ${repository}`;
+    }
+
+    return `Open ${title} at ${host}`;
+}
+
 class Link extends React.Component {
     render() {
         return(
@@ -101,13 +117,13 @@ class Links extends React.Component {
 
         var links = [];
         if (this.props.links.direct) {
-            this.props.links.direct.forEach(function(e) {
-                links.push(<Link key={`direct-${e}`} url={e} fa="fas fa-external-link-alt" label="Open project website" />);
+            this.props.links.direct.forEach((e) => {
+                links.push(<Link key={`direct-${e}`} url={e} fa="fas fa-external-link-alt" label={linkLabel(e, "direct", this.props.title)} />);
             });
         }
         if (this.props.links.github) {
-            this.props.links.github.forEach(function(e) {
-                links.push(<Link key={`github-${e}`} url={e} fa="fab fa-github" label="Open GitHub repository" />);
+            this.props.links.github.forEach((e) => {
+                links.push(<Link key={`github-${e}`} url={e} fa="fab fa-github" label={linkLabel(e, "github", this.props.title)} />);
             });
         }
 
@@ -128,7 +144,7 @@ class WorkContainer extends React.Component {
                 <Title title={this.props.json.title}/>
                 <Preview title={this.props.json.title} type={this.props.json.previewType} previewSrc={this.props.json.previewSrc} />
                 <Description descriptionText={this.props.json.descriptionText} keywords={this.props.json.keywords}/>
-                <Links links={this.props.json.links}/>
+                <Links title={this.props.json.title} links={this.props.json.links}/>
             </div>
         );
     }
