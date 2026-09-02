@@ -1,5 +1,6 @@
 const DEFAULT_GESTURE_TIMEOUT_MS = 140;
 const DEFAULT_DISCRETE_DELTA_THRESHOLD = 80;
+const CONTINUOUS_SCROLL_DELTA_THRESHOLD = 80;
 const NORMAL_SCROLL_DURATION_MS = 800;
 const QUEUED_SCROLL_BASE_MS = 500;
 const MIN_SCROLL_DURATION_MS = 100;
@@ -26,21 +27,83 @@ class WheelGestureInterpreter {
 
         const now = Number.isFinite(timestamp) ? timestamp : 0;
         const direction = deltaY > 0 ? 1 : -1;
-        const isDiscrete = deltaMode !== 0 || Math.abs(deltaY) >= this.discreteDeltaThreshold;
+        const deltaMagnitude = Math.abs(deltaY);
+        const isDiscrete = deltaMode !== 0 || deltaMagnitude >= this.discreteDeltaThreshold;
         const activeGesture = this.activeGesture;
 
         if (!activeGesture || now < activeGesture.lastTimestamp || now - activeGesture.lastTimestamp > this.gestureTimeoutMs) {
-            this.activeGesture = {direction, isDiscrete, lastTimestamp: now};
+            this.activeGesture = {
+                direction,
+                isDiscrete,
+                lastTimestamp: now,
+                accumulatedDelta: 0,
+                oppositeDelta: 0,
+                lastMagnitude: deltaMagnitude,
+                oppositeLastMagnitude: 0,
+                isDecelerating: false,
+                oppositeIsDecelerating: false
+            };
             return direction;
         }
 
         activeGesture.lastTimestamp = now;
 
-        if (activeGesture.isDiscrete) {
+        if (activeGesture.isDiscrete || isDiscrete) {
             return direction;
         }
 
-        return 0;
+        if (direction === activeGesture.direction) {
+            activeGesture.oppositeDelta = 0;
+            activeGesture.oppositeLastMagnitude = 0;
+            activeGesture.oppositeIsDecelerating = false;
+
+            if (deltaMagnitude < activeGesture.lastMagnitude * 0.8) {
+                activeGesture.isDecelerating = true;
+            } else if (activeGesture.isDecelerating && deltaMagnitude > activeGesture.lastMagnitude * 1.5) {
+                activeGesture.isDecelerating = false;
+                activeGesture.accumulatedDelta = 0;
+                activeGesture.lastMagnitude = deltaMagnitude;
+                return direction;
+            }
+
+            activeGesture.lastMagnitude = deltaMagnitude;
+            if (activeGesture.isDecelerating) {
+                return 0;
+            }
+
+            activeGesture.accumulatedDelta += deltaMagnitude;
+            if (activeGesture.accumulatedDelta >= CONTINUOUS_SCROLL_DELTA_THRESHOLD) {
+                activeGesture.accumulatedDelta -= CONTINUOUS_SCROLL_DELTA_THRESHOLD;
+                return direction;
+            }
+            return 0;
+        }
+
+        activeGesture.oppositeDelta += deltaMagnitude;
+        if (activeGesture.oppositeLastMagnitude &&
+            deltaMagnitude < activeGesture.oppositeLastMagnitude * 0.8) {
+            activeGesture.oppositeIsDecelerating = true;
+        }
+        activeGesture.oppositeLastMagnitude = deltaMagnitude;
+        if (activeGesture.oppositeIsDecelerating) {
+            return 0;
+        }
+        if (activeGesture.oppositeDelta < CONTINUOUS_SCROLL_DELTA_THRESHOLD) {
+            return 0;
+        }
+
+        this.activeGesture = {
+            direction,
+            isDiscrete: false,
+            lastTimestamp: now,
+            accumulatedDelta: 0,
+            oppositeDelta: 0,
+            lastMagnitude: deltaMagnitude,
+            oppositeLastMagnitude: 0,
+            isDecelerating: false,
+            oppositeIsDecelerating: false
+        };
+        return direction;
     }
 }
 
