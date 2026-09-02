@@ -1037,10 +1037,15 @@ $(function(){
             return;
         }
 
-        updateScrollControls();
-        if (!isListBeingScrolled) {
-            scheduleScrollDrain();
+        if (isListBeingScrolled) {
+            clearTimeout(scrollCompletionTimer);
+            scrollCompletionTimer = null;
+            isListBeingScrolled = false;
+            drainScrollQueue();
+            return;
         }
+
+        scheduleScrollDrain();
     }
 
     function drainScrollQueue() {
