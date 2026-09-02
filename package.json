@@ -13,7 +13,7 @@
   "scripts": {
     "start": "webpack serve --open --mode development",
     "build": "cross-env NODE_ENV=production webpack --mode production",
-    "test": "node test/portfolio-content.test.js",
+    "test": "node test/portfolio-content.test.js && node test/scroll-gesture.test.cjs",
     "lint": "eslint src/index.js src/App.jsx webpack.config.js",
     "stats": "cross-env NODE_ENV=production webpack --mode production --profile --json > stats.json"
   },

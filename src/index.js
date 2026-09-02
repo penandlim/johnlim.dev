@@ -26,6 +26,11 @@ import 'loaders.css/loaders.min.css';
 
 import './css/index.css';
 import "grained";
+const {
+    WheelGestureInterpreter,
+    ScrollIntentQueue,
+    getScrollStepDuration
+} = require("./scroll-gesture.cjs");
 
 Object.defineProperty(Vector3.prototype, "lerpArray", {
     value: function SayHi(toArray, i) {
@@ -105,6 +110,9 @@ searchImage = loader.load(SMAAEffect.searchImageDataURL);
 areaImage = loader.load(SMAAEffect.areaImageDataURL);
 
 let isListBeingScrolled = false;
+let scrollCompletionTimer = null;
+const wheelGestureInterpreter = new WheelGestureInterpreter();
+const scrollIntentQueue = new ScrollIntentQueue();
 
 
 const mainEl = $("main");
@@ -210,11 +218,11 @@ $(function(){
     outerBar = $(".outerBar");
     topArrow = $(".topArrow");
     topArrow.on("click", function() {
-        scrollListUp();
+        requestScroll(-1);
     });
     bottomArrow = $(".bottomArrow");
     bottomArrow.on("click", function() {
-        scrollListDown();
+        requestScroll(1);
     });
 
     const loadError = $("#loadError");
@@ -248,6 +256,9 @@ $(function(){
 
                 const parsedJsonData = jsonData.works;
                 totalWorksCount = parsedJsonData.length;
+                scrollIntentQueue.setBounds(totalWorksCount - 1);
+                scrollIntentQueue.reset(curCss3dObjIndex);
+                wheelGestureInterpreter.reset();
                 flushSync(() => {
                     reactRoot.render(<App parsedJsonData={parsedJsonData}/>);
                 });
@@ -978,114 +989,114 @@ $(function(){
     });
 
     function scrollEventHandler(event) {
-        const delta = event.originalEvent.deltaY;
+        const wheelEvent = event.originalEvent;
 
         if (currentWindowState === WindowStates.WORKS) {
-            if (delta > 0)
-                scrollListDown();
-            else
-                scrollListUp();
+            const direction = wheelGestureInterpreter.input({
+                deltaY: wheelEvent.deltaY,
+                deltaMode: wheelEvent.deltaMode,
+                timestamp: performance.now()
+            });
+
+            if (direction !== 0) {
+                requestScroll(direction);
+            }
+        } else {
+            wheelGestureInterpreter.reset();
         }
 
         return false; // this line is only added so the whole page won't scroll in the demo
     }
 
+    function updateScrollControls() {
+        if (!topArrow || !bottomArrow || !css3dObjArray.length) {
+            return;
+        }
+
+        topArrow.toggleClass("dimmed", scrollIntentQueue.targetIndex === 0);
+        bottomArrow.toggleClass("dimmed", scrollIntentQueue.targetIndex === css3dObjArray.length - 1);
+    }
+
+    function requestScroll(direction) {
+        if (currentWindowState !== WindowStates.WORKS || !css3dObjArray.length) {
+            return;
+        }
+
+        scrollIntentQueue.request(direction);
+        updateScrollControls();
+        drainScrollQueue();
+    }
+
+    function drainScrollQueue() {
+        if (isListBeingScrolled || currentWindowState !== WindowStates.WORKS) {
+            return;
+        }
+
+        const nextIndex = scrollIntentQueue.nextStep();
+        if (nextIndex === null) {
+            updateScrollControls();
+            return;
+        }
+
+        const previousIndex = curCss3dObjIndex;
+        const direction = nextIndex - previousIndex;
+        const duration = getScrollStepDuration(scrollIntentQueue.pendingSteps);
+
+        pausePreviewVideo(previousIndex);
+        isListBeingScrolled = true;
+        curCss3dObjIndex = nextIndex;
+        innerBar.css("top", (100 * nextIndex / totalWorksCount) + "%");
+
+        if (css3dObjArray[previousIndex].userData.tween) {
+            tweenGroup.remove(css3dObjArray[previousIndex].userData.tween);
+        }
+        css3dObjArray[previousIndex].userData.tween = new TWEEN.Tween(css3dObjArray[previousIndex].scale, tweenGroup)
+            .to({x: 0.0001, y: 0.0001, z: 0.0001}, duration)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .start();
+
+        if (css3dObjArray[nextIndex].userData.tween) {
+            tweenGroup.remove(css3dObjArray[nextIndex].userData.tween);
+        }
+        css3dObjArray[nextIndex].userData.tween = new TWEEN.Tween(css3dObjArray[nextIndex].scale, tweenGroup)
+            .to({x: 1, y: 1, z: 1}, duration)
+            .easing(direction > 0 ? TWEEN.Easing.Back.Out : TWEEN.Easing.Quadratic.InOut)
+            .start();
+
+        if (css3dObjGroup.userData.tween) {
+            tweenGroup.remove(css3dObjGroup.userData.tween);
+        }
+        css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position, tweenGroup)
+            .to({y: 1000 * nextIndex + css3dObjGroupOffset}, duration)
+            .easing(TWEEN.Easing.Quadratic.Out)
+            .start();
+
+        playPreviewVideo(nextIndex);
+        updateScrollControls();
+
+        scrollCompletionTimer = setTimeout(function() {
+            scrollCompletionTimer = null;
+            isListBeingScrolled = false;
+            drainScrollQueue();
+        }, duration);
+    }
+
     function scrollListDown() {
-        if (!isListBeingScrolled && curCss3dObjIndex < css3dObjArray.length - 1) {
-
-            pausePreviewVideo(curCss3dObjIndex);
-            isListBeingScrolled = true;
-            topArrow.removeClass("dimmed");
-
-            innerBar.css("top", (100 * (curCss3dObjIndex + 1 ) / totalWorksCount) + "%");
-
-            if (css3dObjArray[curCss3dObjIndex].userData.tween) {
-                tweenGroup.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
-            }
-            css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale, tweenGroup)
-                .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
-                .easing(TWEEN.Easing.Cubic.Out)
-                .start();
-
-            if (css3dObjArray[curCss3dObjIndex + 1].userData.tween) {
-                tweenGroup.remove(css3dObjArray[curCss3dObjIndex + 1].userData.tween);
-            }
-            css3dObjArray[curCss3dObjIndex + 1].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex + 1].scale, tweenGroup)
-                .to({x: 1, y: 1, z: 1}, 800)
-                .easing(TWEEN.Easing.Back.Out)
-                .start();
-
-            if (css3dObjGroup.userData.tween) {
-                tweenGroup.remove(css3dObjGroup.userData.tween);
-            }
-            css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position, tweenGroup) // Create a new tween that modifies 'coords'.
-                .to({ y: 1000 * (curCss3dObjIndex + 1) + css3dObjGroupOffset }, 800) // Move to (300, 200) in 1 second.
-                .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
-                // .onComplete(function() {
-                //     isListBeingScrolled = false;
-                // })
-                .start(); // Sta
-
-            setTimeout(function() {
-                isListBeingScrolled = false;
-            }, 300);
-
-            curCss3dObjIndex += 1;
-            playPreviewVideo(curCss3dObjIndex);
-        }
-
-        if (curCss3dObjIndex === css3dObjArray.length - 1) {
-            bottomArrow.addClass("dimmed");
-        }
+        requestScroll(1);
     }
 
     function scrollListUp() {
-        if (!isListBeingScrolled && curCss3dObjIndex > 0) {
-            pausePreviewVideo(curCss3dObjIndex);
-            bottomArrow.removeClass("dimmed");
-
-            innerBar.css("top", (100 * (curCss3dObjIndex - 1 ) / totalWorksCount) + "%");
-
-            isListBeingScrolled = true;
-
-            if (css3dObjArray[curCss3dObjIndex].userData.tween) {
-                tweenGroup.remove(css3dObjArray[curCss3dObjIndex].userData.tween);
-            }
-            css3dObjArray[curCss3dObjIndex].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex].scale, tweenGroup)
-                .to({x: 0.0001, y: 0.0001, z: 0.0001}, 800)
-                .easing(TWEEN.Easing.Cubic.Out)
-                .start();
-
-            if (css3dObjArray[curCss3dObjIndex - 1].userData.tween) {
-                tweenGroup.remove(css3dObjArray[curCss3dObjIndex - 1].userData.tween);
-            }
-            css3dObjArray[curCss3dObjIndex - 1].userData.tween = new TWEEN.Tween(css3dObjArray[curCss3dObjIndex - 1].scale, tweenGroup)
-                .to({x: 1, y: 1, z: 1}, 800)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
-
-            if (css3dObjGroup.userData.tween) {
-                tweenGroup.remove(css3dObjGroup.userData.tween);
-            }
-            css3dObjGroup.userData.tween = new TWEEN.Tween(css3dObjGroup.position, tweenGroup) // Create a new tween that modifies 'coords'.
-                .to({ y: 1000 * (curCss3dObjIndex - 1) + css3dObjGroupOffset }, 800) // Move to (300, 200) in 1 second.
-                .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
-                // .onComplete(function() {
-                //     isListBeingScrolled = false;
-                // })
-                .start(); // Start
-
-            setTimeout(function() {
-                isListBeingScrolled = false;
-            }, 300);
-
-            curCss3dObjIndex -= 1;
-            playPreviewVideo(curCss3dObjIndex);
+        requestScroll(-1);
+    }
+    function resetScrollNavigation() {
+        if (scrollCompletionTimer) {
+            clearTimeout(scrollCompletionTimer);
+            scrollCompletionTimer = null;
         }
-
-        if (curCss3dObjIndex === 0) {
-            topArrow.addClass("dimmed");
-        }
+        isListBeingScrolled = false;
+        wheelGestureInterpreter.reset();
+        scrollIntentQueue.reset(curCss3dObjIndex);
+        updateScrollControls();
     }
 
     function onDocumentMouseMove(event) {
@@ -1228,6 +1239,7 @@ $(function(){
         } else if (currentWindowState === WindowStates.WORKS) {
             TransitionFromWorks();
         }
+        resetScrollNavigation();
         currentWindowState = WindowStates.HOME;
 
         $(this).addClass("active");
@@ -1252,6 +1264,7 @@ $(function(){
         if (currentWindowState === WindowStates.CONTACT) {
             TransitionFromContact();
         }
+        resetScrollNavigation();
         currentWindowState = WindowStates.WORKS;
 
         $(this).addClass("active");
@@ -1270,6 +1283,7 @@ $(function(){
         if (currentWindowState === WindowStates.WORKS) {
             TransitionFromWorks();
         }
+        resetScrollNavigation();
 
         currentWindowState = WindowStates.CONTACT;
         event.preventDefault();
