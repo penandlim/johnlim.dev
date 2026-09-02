@@ -110,6 +110,7 @@ searchImage = loader.load(SMAAEffect.searchImageDataURL);
 areaImage = loader.load(SMAAEffect.areaImageDataURL);
 
 let isListBeingScrolled = false;
+let scrollCompletionTimer = null;
 const wheelGestureInterpreter = new WheelGestureInterpreter();
 const scrollIntentQueue = new ScrollIntentQueue();
 
@@ -1073,7 +1074,8 @@ $(function(){
         playPreviewVideo(nextIndex);
         updateScrollControls();
 
-        setTimeout(function() {
+        scrollCompletionTimer = setTimeout(function() {
+            scrollCompletionTimer = null;
             isListBeingScrolled = false;
             drainScrollQueue();
         }, duration);
@@ -1087,6 +1089,11 @@ $(function(){
         requestScroll(-1);
     }
     function resetScrollNavigation() {
+        if (scrollCompletionTimer) {
+            clearTimeout(scrollCompletionTimer);
+            scrollCompletionTimer = null;
+        }
+        isListBeingScrolled = false;
         wheelGestureInterpreter.reset();
         scrollIntentQueue.reset(curCss3dObjIndex);
         updateScrollControls();
