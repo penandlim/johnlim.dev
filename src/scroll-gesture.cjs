@@ -39,9 +39,7 @@ class WheelGestureInterpreter {
                 accumulatedDelta: 0,
                 oppositeDelta: 0,
                 lastMagnitude: deltaMagnitude,
-                oppositeLastMagnitude: 0,
-                isDecelerating: false,
-                oppositeIsDecelerating: false
+                isDecelerating: false
             };
             return direction;
         }
@@ -53,9 +51,6 @@ class WheelGestureInterpreter {
         }
 
         if (direction === activeGesture.direction) {
-            activeGesture.oppositeDelta = 0;
-            activeGesture.oppositeLastMagnitude = 0;
-            activeGesture.oppositeIsDecelerating = false;
 
             if (deltaMagnitude < activeGesture.lastMagnitude * 0.8) {
                 activeGesture.isDecelerating = true;
@@ -80,14 +75,6 @@ class WheelGestureInterpreter {
         }
 
         activeGesture.oppositeDelta += deltaMagnitude;
-        if (activeGesture.oppositeLastMagnitude &&
-            deltaMagnitude < activeGesture.oppositeLastMagnitude * 0.8) {
-            activeGesture.oppositeIsDecelerating = true;
-        }
-        activeGesture.oppositeLastMagnitude = deltaMagnitude;
-        if (activeGesture.oppositeIsDecelerating) {
-            return 0;
-        }
         if (activeGesture.oppositeDelta < CONTINUOUS_SCROLL_DELTA_THRESHOLD) {
             return 0;
         }
@@ -99,9 +86,7 @@ class WheelGestureInterpreter {
             accumulatedDelta: 0,
             oppositeDelta: 0,
             lastMagnitude: deltaMagnitude,
-            oppositeLastMagnitude: 0,
-            isDecelerating: false,
-            oppositeIsDecelerating: false
+            isDecelerating: false
         };
         return direction;
     }
