@@ -36,6 +36,26 @@ assert.deepStrictEqual(
     [1],
     "a high-momentum pixel burst must remain one logical input"
 );
+assert.deepStrictEqual(
+    directionsFor(Array.from({length: 9}, (_, index) => ({
+        deltaY: 10,
+        timestamp: index * 16
+    }))),
+    [1, 1],
+    "sustained touchpad scrolling must produce another queued input"
+);
+
+assert.deepStrictEqual(
+    directionsFor([
+        {deltaY: 10, timestamp: 0},
+        ...Array.from({length: 8}, (_, index) => ({
+            deltaY: -10,
+            timestamp: (index + 1) * 16
+        }))
+    ]),
+    [1, -1],
+    "sustained opposite scrolling must queue a reversal"
+);
 
 assert.deepStrictEqual(
     directionsFor([
