@@ -56,6 +56,17 @@ assert.deepStrictEqual(
     [1, -1],
     "sustained opposite scrolling must queue a reversal"
 );
+assert.deepStrictEqual(
+    directionsFor([
+        {deltaY: 10, timestamp: 0},
+        {deltaY: -20, timestamp: 16},
+        {deltaY: -10, timestamp: 32},
+        {deltaY: -30, timestamp: 48},
+        {deltaY: -20, timestamp: 64}
+    ]),
+    [1, -1],
+    "uneven opposite touchpad scrolling must recover and queue a reversal"
+);
 
 assert.deepStrictEqual(
     directionsFor([
