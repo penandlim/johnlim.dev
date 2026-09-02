@@ -25,7 +25,7 @@ class WheelGestureInterpreter {
 
         const now = Number.isFinite(timestamp) ? timestamp : 0;
         const direction = deltaY > 0 ? 1 : -1;
-        const isDiscrete = deltaMode === 1 || Math.abs(deltaY) >= this.discreteDeltaThreshold;
+        const isDiscrete = deltaMode !== 0 || Math.abs(deltaY) >= this.discreteDeltaThreshold;
         const activeGesture = this.activeGesture;
 
         if (!activeGesture || now < activeGesture.lastTimestamp || now - activeGesture.lastTimestamp > this.gestureTimeoutMs) {
