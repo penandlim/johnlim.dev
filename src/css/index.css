@@ -357,6 +357,10 @@ iframe {
     position: absolute;
     top: 0; bottom: 0; left: 0; right: 0;
 }
+img.previewContent {
+    object-fit: contain;
+    background-color: rgba(255,255,255,0.45);
+}
 
 .preview {
     width: 100%;
