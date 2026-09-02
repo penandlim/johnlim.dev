@@ -78,6 +78,15 @@ assert.deepStrictEqual(
     [1, 1, -1],
     "line-mode wheel notches must remain separate inputs"
 );
+assert.deepStrictEqual(
+    directionsFor([
+        {deltaY: 1, deltaMode: 2, timestamp: 0},
+        {deltaY: 1, deltaMode: 2, timestamp: 40},
+        {deltaY: -1, deltaMode: 2, timestamp: 80}
+    ]),
+    [1, 1, -1],
+    "page-mode wheel notches must remain separate inputs"
+);
 
 const queue = new ScrollIntentQueue(9);
 for (let i = 0; i < 5; i += 1) {
