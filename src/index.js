@@ -29,7 +29,8 @@ import "grained";
 const {
     WheelGestureInterpreter,
     ScrollIntentQueue,
-    getScrollStepDuration
+    getScrollStepDuration,
+    SCROLL_DRAIN_DEBOUNCE_MS
 } = require("./scroll-gesture.cjs");
 
 Object.defineProperty(Vector3.prototype, "lerpArray", {
@@ -111,6 +112,7 @@ areaImage = loader.load(SMAAEffect.areaImageDataURL);
 
 let isListBeingScrolled = false;
 let scrollCompletionTimer = null;
+let scrollDrainTimer = null;
 const wheelGestureInterpreter = new WheelGestureInterpreter();
 const scrollIntentQueue = new ScrollIntentQueue();
 
@@ -1017,14 +1019,28 @@ $(function(){
         bottomArrow.toggleClass("dimmed", scrollIntentQueue.targetIndex === css3dObjArray.length - 1);
     }
 
+    function scheduleScrollDrain() {
+        clearTimeout(scrollDrainTimer);
+        scrollDrainTimer = setTimeout(function() {
+            scrollDrainTimer = null;
+            drainScrollQueue();
+        }, SCROLL_DRAIN_DEBOUNCE_MS);
+    }
+
     function requestScroll(direction) {
         if (currentWindowState !== WindowStates.WORKS || !css3dObjArray.length) {
             return;
         }
 
-        scrollIntentQueue.request(direction);
+        if (!scrollIntentQueue.request(direction)) {
+            updateScrollControls();
+            return;
+        }
+
         updateScrollControls();
-        drainScrollQueue();
+        if (!isListBeingScrolled) {
+            scheduleScrollDrain();
+        }
     }
 
     function drainScrollQueue() {
@@ -1092,6 +1108,10 @@ $(function(){
         if (scrollCompletionTimer) {
             clearTimeout(scrollCompletionTimer);
             scrollCompletionTimer = null;
+        }
+        if (scrollDrainTimer) {
+            clearTimeout(scrollDrainTimer);
+            scrollDrainTimer = null;
         }
         isListBeingScrolled = false;
         wheelGestureInterpreter.reset();

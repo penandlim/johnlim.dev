@@ -3,6 +3,7 @@ const DEFAULT_DISCRETE_DELTA_THRESHOLD = 80;
 const NORMAL_SCROLL_DURATION_MS = 800;
 const QUEUED_SCROLL_BASE_MS = 500;
 const MIN_SCROLL_DURATION_MS = 100;
+const SCROLL_DRAIN_DEBOUNCE_MS = 50;
 
 class WheelGestureInterpreter {
     constructor({
@@ -104,6 +105,17 @@ function getScrollStepDuration(pendingSteps) {
         Math.round(QUEUED_SCROLL_BASE_MS / (pendingSteps + 1))
     );
 }
+function getScrollQueueDuration(stepCount) {
+    if (!Number.isFinite(stepCount) || stepCount <= 0) {
+        return 0;
+    }
+
+    let duration = 0;
+    for (let pendingSteps = Math.floor(stepCount) - 1; pendingSteps >= 0; pendingSteps -= 1) {
+        duration += getScrollStepDuration(pendingSteps);
+    }
+    return duration;
+}
 
 module.exports = {
     DEFAULT_GESTURE_TIMEOUT_MS,
@@ -111,7 +123,9 @@ module.exports = {
     NORMAL_SCROLL_DURATION_MS,
     QUEUED_SCROLL_BASE_MS,
     MIN_SCROLL_DURATION_MS,
+    SCROLL_DRAIN_DEBOUNCE_MS,
     WheelGestureInterpreter,
     ScrollIntentQueue,
-    getScrollStepDuration
+    getScrollStepDuration,
+    getScrollQueueDuration
 };
