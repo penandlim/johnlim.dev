@@ -92,6 +92,9 @@ function linkLabel(url, linkType, title) {
     const path = parsedUrl.pathname.split("/").filter(Boolean);
 
     if (linkType === "github") {
+        if (path.length === 1) {
+            return `Open GitHub profile ${path[0]}`;
+        }
         const repository = path.slice(0, 2).join("/");
         if (path[2] === "pull" && path[3]) {
             return `Open GitHub pull request #${path[3]} for ${repository}`;
