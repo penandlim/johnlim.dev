@@ -4,6 +4,7 @@ const {
     NORMAL_SCROLL_DURATION_MS,
     ScrollIntentQueue,
     WheelGestureInterpreter,
+    getScrollQueueDuration,
     getScrollStepDuration
 } = require("../src/scroll-gesture.cjs");
 
@@ -111,12 +112,20 @@ for (let i = 0; i < 10; i += 1) {
     endpoints.request(-1);
 }
 assert.strictEqual(endpoints.targetIndex, 0, "upward queue must clamp at the first card");
-
-let backlogDuration = 0;
-for (let pending = 9; pending >= 0; pending -= 1) {
-    backlogDuration += getScrollStepDuration(pending);
+const timingQueue = new ScrollIntentQueue(9);
+for (let i = 0; i < 10; i += 1) {
+    timingQueue.request(1);
 }
-assert.ok(backlogDuration <= 2000, "ten queued inputs must digest within two seconds");
+let queuedStepCount = 0;
+while (timingQueue.nextStep() !== null) {
+    queuedStepCount += 1;
+}
+assert.strictEqual(queuedStepCount, 9, "ten inputs at the endpoint must produce nine scroll steps");
+assert.ok(
+    getScrollQueueDuration(queuedStepCount) <= 2000,
+    "the coordinator's ten-input queue must digest within two seconds"
+);
+assert.strictEqual(getScrollQueueDuration(0), 0);
 assert.strictEqual(getScrollStepDuration(0), NORMAL_SCROLL_DURATION_MS);
 assert.ok(getScrollStepDuration(9) >= MIN_SCROLL_DURATION_MS);
 assert.ok(getScrollStepDuration(9) < getScrollStepDuration(1));
